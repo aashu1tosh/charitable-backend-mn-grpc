@@ -1,6 +1,6 @@
-package org.charitable.app.infrastructure.adapter.inbound.grpc;
+package org.charitable.app.infrastructure.adapter.inbound.grpc.ping;
 
-import org.charitable.app.application.PingService;
+import org.charitable.app.application.service.ping.PingService;
 import org.charitable.app.domain.Ping;
 import org.charitable.app.proto.PingReply;
 import org.charitable.app.proto.PingRequest;

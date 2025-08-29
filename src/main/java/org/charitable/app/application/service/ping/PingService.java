@@ -1,4 +1,4 @@
-package org.charitable.app.application;
+package org.charitable.app.application.service.ping;
 
 import java.time.Instant;
 
