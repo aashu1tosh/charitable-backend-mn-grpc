@@ -3,7 +3,7 @@ package org.charitable.app.infrastructure.adapter.inbound.rest.ping;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 
-@Controller("/api/ping")
+@Controller("/api/v1/ping")
 public class PingController {
 
     @Get()

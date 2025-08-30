@@ -22,6 +22,10 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
+    annotationProcessor("org.projectlombok:lombok:1.18.30") // Use the latest version
+    compileOnly("org.projectlombok:lombok:1.18.30")
+
+
     compileOnly("io.micronaut:micronaut-http-client")
     runtimeOnly("ch.qos.logback:logback-classic")
     testImplementation("io.micronaut:micronaut-http-client")
