@@ -1,5 +1,7 @@
 package org.charitable.app.infrastructure.adapter.inbound.rest.ping;
 
+import org.charitable.app.application.dto.response.ApiResponse;
+
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 
@@ -7,8 +9,7 @@ import io.micronaut.http.annotation.Get;
 public class PingController {
 
     @Get()
-    public String ping() {
-        System.out.println("Ping received");
-        return "pong";
+    public ApiResponse<String> ping() {
+        return new ApiResponse<>(true, "Ping successful", "pong");
     }
 }
