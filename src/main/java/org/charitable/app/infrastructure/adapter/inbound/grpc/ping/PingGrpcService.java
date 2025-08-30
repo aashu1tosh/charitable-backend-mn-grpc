@@ -21,6 +21,7 @@ public class PingGrpcService extends PingServiceGrpc.PingServiceImplBase {
         Ping ping = pingService.ping();
 
         PingReply reply = PingReply.newBuilder()
+                .setSuccess(true)
                 .setMessage(ping.getMessage())
                 .setTimestamp(ping.getTimestamp().toString())
                 .build();

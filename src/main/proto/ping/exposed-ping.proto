@@ -11,6 +11,7 @@ service PingService {
 message PingRequest {}
 
 message PingReply {
-  string message = 1;
-  string timestamp = 2;
+  bool success = 1;
+  string message = 2;
+  string timestamp = 3;
 }
