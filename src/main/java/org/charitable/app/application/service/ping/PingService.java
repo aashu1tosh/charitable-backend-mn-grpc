@@ -1,7 +1,5 @@
 package org.charitable.app.application.service.ping;
 
-import java.time.Instant;
-
 import org.charitable.app.application.port.inbound.ping.IPingUseCase;
 import org.charitable.app.domain.model.ping.Ping;
 
@@ -12,6 +10,7 @@ class PingService implements IPingUseCase {
 
     @Override
     public Ping ping() {
-        return new Ping("pong", Instant.now());
+        throw new RuntimeException("JPT Error occurred");
+        // return new Ping("pong", Instant.now());
     }
 }

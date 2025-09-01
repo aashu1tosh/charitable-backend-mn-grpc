@@ -18,11 +18,19 @@ dependencies {
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut:micronaut-discovery-core")
     implementation("io.micronaut.grpc:micronaut-grpc-runtime")
+
+    // serializer
     implementation("io.micronaut.serde:micronaut-serde-jackson")
+
     implementation("javax.annotation:javax.annotation-api")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.30") // Use the latest version
+
+    // for jpa support
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+
+    // for lombok
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
     compileOnly("org.projectlombok:lombok:1.18.30")
 
 
