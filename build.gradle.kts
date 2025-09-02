@@ -18,6 +18,9 @@ dependencies {
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut:micronaut-discovery-core")
     implementation("io.micronaut.grpc:micronaut-grpc-runtime")
+    implementation("io.micronaut.validation:micronaut-validation")
+
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
 
     // serializer
     implementation("io.micronaut.serde:micronaut-serde-jackson")

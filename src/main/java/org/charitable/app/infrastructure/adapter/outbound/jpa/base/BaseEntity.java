@@ -9,12 +9,14 @@ import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.GeneratedValue.Type;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @MappedEntity
+@MappedSuperclass
 public abstract class BaseEntity {
 
     @Id
