@@ -11,48 +11,56 @@ group = "org.charitable.app"
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
-    annotationProcessor("io.micronaut:micronaut-http-validation")
-    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-    implementation("io.micronaut:micronaut-discovery-core")
-    implementation("io.micronaut.grpc:micronaut-grpc-runtime")
-    implementation("io.micronaut.validation:micronaut-validation")
+    // Annotation processors - use compatible versions
+    annotationProcessor("io.micronaut:micronaut-http-validation:4.9.4")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor:2.12.0")
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations:4.11.5")
 
+    // Core Micronaut dependencies - use 4.9.4 for consistency
+    implementation("io.micronaut:micronaut-discovery-core:4.9.4")
+    implementation("io.micronaut.grpc:micronaut-grpc-runtime:4.11.0")
+    implementation("io.micronaut.validation:micronaut-validation:4.9.0")
+
+    // Validation
     implementation("jakarta.validation:jakarta.validation-api:3.0.2")
 
-    // serializer
-    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    // Security
+    implementation("io.micronaut.security:micronaut-security:4.11.5")
 
-    implementation("javax.annotation:javax.annotation-api")
+    // Serialization
+    implementation("io.micronaut.serde:micronaut-serde-jackson:2.12.0")
+
+    // Annotations
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
+    // JPA support
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa:4.9.0")
 
-    // for jpa support
-    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
-
-    // for lombok
+    // Lombok
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     compileOnly("org.projectlombok:lombok:1.18.30")
 
-
-    compileOnly("io.micronaut:micronaut-http-client")
-    runtimeOnly("ch.qos.logback:logback-classic")
-    testImplementation("io.micronaut:micronaut-http-client")
+    // HTTP client and logging
+    compileOnly("io.micronaut:micronaut-http-client:4.9.4")
+    runtimeOnly("ch.qos.logback:logback-classic:1.4.14")
+    testImplementation("io.micronaut:micronaut-http-client:4.9.4")
 }
-
 
 application {
     mainClass = "org.charitable.app.Application"
 }
+
 java {
     sourceCompatibility = JavaVersion.toVersion("21")
     targetCompatibility = JavaVersion.toVersion("21")
 }
 
-
 graalvmNative.toolchainDetection = false
+
 sourceSets {
     main {
         java {
@@ -102,9 +110,6 @@ micronaut {
     }
 }
 
-
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
     jdkVersion = "21"
 }
-
-
