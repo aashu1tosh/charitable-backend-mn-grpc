@@ -18,12 +18,17 @@ dependencies {
     // Annotation processors - use compatible versions
     annotationProcessor("io.micronaut:micronaut-http-validation:4.9.4")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor:2.12.0")
-    annotationProcessor("io.micronaut.security:micronaut-security-annotations:4.11.5")
 
     // Core Micronaut dependencies - use 4.9.4 for consistency
     implementation("io.micronaut:micronaut-discovery-core:4.9.4")
     implementation("io.micronaut.grpc:micronaut-grpc-runtime:4.11.0")
     implementation("io.micronaut.validation:micronaut-validation:4.9.0")
+
+    //security (for bcrypt)
+    implementation("org.springframework.security:spring-security-crypto:6.1.5")
+
+    // for cli (like seeding db)
+    implementation("io.micronaut.picocli:micronaut-picocli")
 
     // Validation
     implementation("jakarta.validation:jakarta.validation-api:3.0.2")
@@ -112,4 +117,12 @@ micronaut {
 
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
     jdkVersion = "21"
+}
+
+tasks.register<JavaExec>("seedSudoAdmin") {
+    group = "application"
+    description = "Seed sudo admin users"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.charitable.app.infrastructure.command.SeedCommand")
+    args("--admin")
 }

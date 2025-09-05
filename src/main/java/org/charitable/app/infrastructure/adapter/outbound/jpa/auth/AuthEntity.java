@@ -8,9 +8,7 @@ import jakarta.persistence.Table;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 
 @MappedEntity
@@ -18,6 +16,8 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
+@Setter
 public class AuthEntity extends BaseEntity {
 
     @Column(name = "email", nullable = false, unique = true)
