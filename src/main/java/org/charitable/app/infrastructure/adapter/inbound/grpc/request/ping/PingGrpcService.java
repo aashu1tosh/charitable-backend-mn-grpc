@@ -1,4 +1,4 @@
-package org.charitable.app.infrastructure.adapter.inbound.grpc.ping;
+package org.charitable.app.infrastructure.adapter.inbound.grpc.request.ping;
 
 import org.charitable.app.application.port.inbound.ping.IPingUseCase;
 import org.charitable.app.domain.model.ping.Ping;

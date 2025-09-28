@@ -5,12 +5,13 @@ import org.charitable.app.domain.model.ping.Ping;
 
 import jakarta.inject.Singleton;
 
+import java.time.Instant;
+
 @Singleton
 class PingService implements IPingUseCase {
 
     @Override
     public Ping ping() {
-        throw new RuntimeException("JPT Error occurred");
-        // return new Ping("pong", Instant.now());
+         return new Ping("pong", Instant.now());
     }
 }
