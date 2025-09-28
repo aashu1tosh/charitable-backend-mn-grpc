@@ -5,17 +5,17 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @Serdeable
-public class ApiResponse<T> {
-    private boolean success;
-    private String message;
-    private String timestamp;
-    private T data;
+public class AppResponse<T> {
+    private final boolean success;
+    private final String message;
+    private final String timestamp;
+    private final T data;
 
-    public ApiResponse(boolean success, String message, T data) {
+    public AppResponse(boolean success, String message, T data) {
         this.success = success;
         this.message = message;
         this.timestamp = nowUtc();
@@ -24,8 +24,7 @@ public class ApiResponse<T> {
     }
 
     private static String nowUtc() {
-        String nowUtc = DateTimeFormatter.ISO_INSTANT
+        return DateTimeFormatter.ISO_INSTANT
                 .format(Instant.now().atZone(ZoneOffset.UTC));
-        return nowUtc;
     }
 }

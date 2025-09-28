@@ -1,6 +1,6 @@
 package org.charitable.app.infrastructure.adapter.inbound.grpc.request.ping;
 
-import org.charitable.app.application.port.inbound.ping.IPingUseCase;
+import org.charitable.app.application.port.inbound.ping.PingUseCase;
 import org.charitable.app.domain.model.ping.Ping;
 import org.charitable.app.proto.PingReply;
 import org.charitable.app.proto.PingRequest;
@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PingGrpcService extends PingServiceGrpc.PingServiceImplBase {
 
-    private final IPingUseCase pingService;
+    private final PingUseCase pingService;
 
     @Override
     public void ping(PingRequest request, StreamObserver<PingReply> responseObserver) {
