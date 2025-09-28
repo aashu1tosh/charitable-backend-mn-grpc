@@ -30,6 +30,21 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
+    public void register(RegisterRequest request, StreamObserver<RegisterResponse> responseObserver) {
+
+        String username = request.getUsername();
+        String password = request.getPassword();
+        String email = request.getEmail();
+
+        RegisterResponse response = RegisterResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("User registered successfully")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void logout(LogoutRequest request, @NotNull StreamObserver<LogoutResponse> responseObserver) {
         LogoutResponse response = LogoutResponse.newBuilder()
                 .setSuccess(true)
