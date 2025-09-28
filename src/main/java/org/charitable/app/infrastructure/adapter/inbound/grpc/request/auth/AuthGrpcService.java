@@ -2,6 +2,7 @@ package org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth;
 
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Singleton;
+import jakarta.validation.constraints.NotNull;
 import org.charitable.app.proto.*;
 
 @Singleton
@@ -29,7 +30,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
-    public void logout(LogoutRequest request, StreamObserver<LogoutResponse> responseObserver) {
+    public void logout(LogoutRequest request, @NotNull StreamObserver<LogoutResponse> responseObserver) {
         LogoutResponse response = LogoutResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Logout successful")

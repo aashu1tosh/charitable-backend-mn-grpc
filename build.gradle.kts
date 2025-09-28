@@ -24,6 +24,9 @@ dependencies {
     implementation("io.micronaut.grpc:micronaut-grpc-runtime:4.11.0")
     implementation("io.micronaut.validation:micronaut-validation:4.9.0")
 
+    // for server reflection
+    implementation("io.grpc:grpc-services")
+
     //security (for bcrypt)
     implementation("org.springframework.security:spring-security-crypto:6.1.5")
 
@@ -102,8 +105,6 @@ micronaut {
         annotations("org.charitable.app.*")
     }
     aot {
-        // Please review carefully the optimizations enabled below
-        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
         optimizeServiceLoading = false
         convertYamlToJava = false
         precomputeOperations = true
