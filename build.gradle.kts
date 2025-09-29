@@ -19,6 +19,9 @@ dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation:4.9.4")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor:2.12.0")
 
+    // PostgreSQL JDBC Driver
+    runtimeOnly("org.postgresql:postgresql:42.7.3")
+
     // Core Micronaut dependencies - use 4.9.4 for consistency
     implementation("io.micronaut:micronaut-discovery-core:4.9.4")
     implementation("io.micronaut.grpc:micronaut-grpc-runtime:4.11.0")
