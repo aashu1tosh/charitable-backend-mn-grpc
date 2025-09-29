@@ -1,21 +1,15 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
 import io.micronaut.data.annotation.MappedEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 
-@MappedEntity
+@Entity
 @Table(name = "auth")
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Getter
 @Setter
 public class AuthEntity extends BaseEntity {
