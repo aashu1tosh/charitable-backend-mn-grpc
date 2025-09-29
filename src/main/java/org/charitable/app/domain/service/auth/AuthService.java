@@ -14,6 +14,5 @@ class AuthService implements AuthUseCase {
         } else {
             return new AppResponse<String>(false, "Invalid credentials", "");
         }
-//        return new AppResponse<String>(true, "Login successful", "");
     }
 }

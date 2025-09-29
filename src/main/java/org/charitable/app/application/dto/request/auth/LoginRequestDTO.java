@@ -1,23 +1,22 @@
 package org.charitable.app.application.dto.request.auth;
 
+import io.micronaut.core.annotation.Introspected;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
+@Introspected
 public class LoginRequestDTO {
 
-    @Email
-    @NotBlank
+    @Email(message = "Username must be a valid email address")
+    @NotBlank(message = "Username cannot be empty")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "Password cannot be empty")
     private String password;
 
 }
