@@ -29,6 +29,5 @@ public class AuthEntity extends BaseEntity {
 
     @Column(name = "role", nullable = false)
     @NotNull
-    @Enumerated(EnumType.STRING)
     private String role;
 }

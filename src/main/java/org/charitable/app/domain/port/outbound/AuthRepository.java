@@ -2,7 +2,9 @@ package org.charitable.app.domain.port.outbound;
 
 import org.charitable.app.domain.entity.auth.Auth;
 
+import java.util.Optional;
+
 public interface AuthRepository {
-    Auth findByEmail(String email);
-    Auth findById(String id);
+    Optional<Auth> findByEmail(String email);
+    Optional<Auth> findById(String id);
 }

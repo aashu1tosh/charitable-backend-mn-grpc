@@ -3,31 +3,41 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.base;
 import java.time.Instant;
 import java.util.UUID;
 
-import io.micronaut.data.annotation.DateCreated;
-import io.micronaut.data.annotation.DateUpdated;
-import io.micronaut.data.annotation.GeneratedValue;
-import io.micronaut.data.annotation.GeneratedValue.Type;
-import io.micronaut.data.annotation.Id;
-import io.micronaut.data.annotation.MappedEntity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
+@MappedSuperclass
 @Getter
 @Setter
-@MappedEntity
-@MappedSuperclass
 public abstract class BaseEntity {
 
     @Id
-    @GeneratedValue(Type.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)  // ← JPA syntax
     private UUID id;
 
-    @DateCreated
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @DateUpdated
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @Column(name = "deleted_at")
     private Instant deletedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
+    }
 }

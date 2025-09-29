@@ -22,6 +22,10 @@ dependencies {
     // PostgreSQL JDBC Driver
     runtimeOnly("org.postgresql:postgresql:42.7.3")
 
+    // Micronaut Data JDBC
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari:5.7.0")
+
+
     // Core Micronaut dependencies - use 4.9.4 for consistency
     implementation("io.micronaut:micronaut-discovery-core:4.9.4")
     implementation("io.micronaut.grpc:micronaut-grpc-runtime:4.11.0")
