@@ -1,4 +1,4 @@
-package org.charitable.app.domain.utils;
+package org.charitable.app.common.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

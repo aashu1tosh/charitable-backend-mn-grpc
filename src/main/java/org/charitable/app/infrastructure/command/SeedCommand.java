@@ -3,6 +3,8 @@ package org.charitable.app.infrastructure.command;
 import io.micronaut.configuration.picocli.PicocliRunner;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.charitable.app.domain.model.Role;
+import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthJpaRepository;
@@ -38,8 +40,10 @@ public class SeedCommand implements Runnable {
                 AuthEntity admin = AuthEntity.builder()
                         .email(sudoAdminEmail)
                         .password(passwordEncoder.encode(rawPassword))
-                        .role("SUDO_ADMIN")
+                        .role(Role.SUDO_ADMIN)
                         .phoneNumber("9876543210")
+                        .status(AuthStatus.ACTIVE)
+                        .isEmailVerified(true)
                         .build();
 
                 authRepository.save(admin);

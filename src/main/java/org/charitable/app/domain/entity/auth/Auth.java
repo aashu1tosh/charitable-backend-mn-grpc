@@ -3,16 +3,18 @@ package org.charitable.app.domain.entity.auth;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.UUID;
+import org.charitable.app.domain.entity.base.Base;
+import org.charitable.app.domain.model.Role;
+import org.charitable.app.domain.model.auth.AuthStatus;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class Auth {
-    private UUID id;
+public class Auth extends Base {
     private String email;
     private String password;
     private String phone;
-    private String role;
+    private Role role;
+    private Boolean isEmailVerified;
+    private AuthStatus status;
 }

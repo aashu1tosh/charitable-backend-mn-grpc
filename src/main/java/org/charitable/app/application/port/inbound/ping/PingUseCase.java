@@ -1,7 +1,7 @@
 package org.charitable.app.application.port.inbound.ping;
 
-import org.charitable.app.domain.model.ping.Ping;
+import org.charitable.app.application.dto.response.AppResponse;
 
 public interface PingUseCase {
-    Ping ping();
+    AppResponse<String> ping();
 }

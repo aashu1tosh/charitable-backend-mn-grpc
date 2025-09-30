@@ -2,7 +2,7 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
 import jakarta.inject.Singleton;
 import org.charitable.app.domain.entity.auth.Auth;
-import org.charitable.app.domain.port.outbound.AuthRepository;
+import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +33,21 @@ class AuthRepositoryImpl implements AuthRepository {
     @Override
     public Optional<Auth> findById(String id) {
         return jpaRepository.findById(UUID.fromString(id))
-                .map(this::mapToDomain);
+                .map(AuthRepositoryImpl::mapToDomain);
     }
 
-    private Auth mapToDomain(AuthEntity entity) {
-        return new Auth(
-                entity.getId(),
+    public static Auth mapToDomain(AuthEntity entity) {
+        var auth =  new Auth(
                 entity.getEmail(),
                 entity.getPassword(),
                 entity.getPhoneNumber(),
-                entity.getRole()
+                entity.getRole(),
+                entity.getIsEmailVerified(),
+                entity.getStatus()
         );
+        auth.setId(entity.getId());
+        auth.setCreatedAt(entity.getCreatedAt());
+        auth.setUpdatedAt(entity.getUpdatedAt());
+        return auth;
     }
 }

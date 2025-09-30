@@ -1,10 +1,10 @@
-package org.charitable.app.domain.service.auth;
+package org.charitable.app.application.service.auth;
 
 import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.response.AppResponse;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
-import org.charitable.app.domain.port.outbound.AuthRepository;
+import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
@@ -34,6 +34,7 @@ class AuthService implements AuthUseCase {
         }
 
         String token = "dummy-token-for-" + auth.get().getId();
+        logger.info("New token for user: {}", token);
         return new AppResponse<String>(true, "Login successful", token);
     }
 }

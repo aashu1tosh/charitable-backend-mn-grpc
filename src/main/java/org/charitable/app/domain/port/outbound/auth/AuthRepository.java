@@ -1,4 +1,4 @@
-package org.charitable.app.domain.port.outbound;
+package org.charitable.app.domain.port.outbound.auth;
 
 import org.charitable.app.domain.entity.auth.Auth;
 

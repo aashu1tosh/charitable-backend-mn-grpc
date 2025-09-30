@@ -1,7 +1,6 @@
 package org.charitable.app.infrastructure.adapter.inbound.grpc.request.ping;
 
 import org.charitable.app.application.port.inbound.ping.PingUseCase;
-import org.charitable.app.domain.model.ping.Ping;
 import org.charitable.app.proto.PingReply;
 import org.charitable.app.proto.PingRequest;
 import org.charitable.app.proto.PingServiceGrpc;
@@ -18,12 +17,12 @@ public class PingGrpcService extends PingServiceGrpc.PingServiceImplBase {
 
     @Override
     public void ping(PingRequest request, StreamObserver<PingReply> responseObserver) {
-        Ping ping = pingService.ping();
+        var ping = pingService.ping();
 
         PingReply reply = PingReply.newBuilder()
                 .setSuccess(true)
                 .setMessage(ping.getMessage())
-                .setTimestamp(ping.getTimestamp().toString())
+                .setTimestamp(ping.getTimestamp())
                 .build();
 
         responseObserver.onNext(reply);

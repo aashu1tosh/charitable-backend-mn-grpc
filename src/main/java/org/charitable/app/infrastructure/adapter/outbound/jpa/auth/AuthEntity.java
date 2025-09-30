@@ -6,7 +6,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.charitable.app.domain.model.Role;
+import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 
 @Entity
 @Table(name = "auth")
@@ -32,5 +35,19 @@ public class AuthEntity extends BaseEntity {
 
     @Column(name = "role", nullable = false)
     @NotNull
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Column(name = "is_email_verified", nullable = false)
+    @NotNull
+    private Boolean isEmailVerified;
+
+    @Column(name = "status", nullable = false)
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AuthStatus status = AuthStatus.ACTIVE;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "organization_id", nullable = true)
+    private OrganizationEntity organization;
 }
