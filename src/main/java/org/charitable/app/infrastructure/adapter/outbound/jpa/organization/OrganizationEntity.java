@@ -14,11 +14,10 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class    OrganizationEntity extends BaseEntity {
+public class OrganizationEntity extends BaseEntity {
 
     @Column(nullable = false)
     @NotNull
-    @Min(4)
     private String name;
 
     @Column

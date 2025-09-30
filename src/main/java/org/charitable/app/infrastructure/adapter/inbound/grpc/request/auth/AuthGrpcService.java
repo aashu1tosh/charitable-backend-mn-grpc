@@ -6,8 +6,12 @@ import jakarta.inject.Singleton;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
+import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
+import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
+import org.charitable.app.domain.model.Role;
+import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +72,58 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
             responseObserver.onCompleted();
             logger.error("Logging failed", e);
         }
+    }
+
+    @Override
+    public void registerOrganization(RegisterOrganizationRequest request, StreamObserver<CommonResponse> responseObserver) {
+        logger.info("Received register organization request for organization: {}", request.getOrganizationName());
+        String password = request.getPassword();
+        String email = request.getEmail();
+        String organizationName = request.getOrganizationName();
+        String address = request.getAddress();
+        String govtId = request.getGovtId();
+        String contactNumber = request.getContactNumber();
+        float latitude = request.getLatitude();
+        float longitude = request.getLongitude();
+
+        var auth = new AuthRegisterRequestDTO(
+                email,
+                password,
+                contactNumber,
+                Role.ORGANIZATION,
+                AuthStatus.ACTIVE
+        );
+
+        Set<ConstraintViolation<AuthRegisterRequestDTO>> violations = validator.validate(auth);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            violations.forEach(v -> sb.append(v.getMessage()));
+            var response = CommonResponse.newBuilder()
+                    .setSuccess(false)
+                    .setMessage(sb.toString())
+                    .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+            return;
+        }
+
+        var org = new OrganizationRegisterRequestDTO(
+                organizationName,
+                address,
+                latitude,
+                longitude,
+                govtId,
+                contactNumber
+        );
+
+        authUseCase.registerOrganization(auth, org);
+
+        CommonResponse response = CommonResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Organization registered successfully")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
