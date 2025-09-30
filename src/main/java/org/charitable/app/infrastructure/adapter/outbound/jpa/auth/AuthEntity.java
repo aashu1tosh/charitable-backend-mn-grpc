@@ -12,6 +12,9 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 @Table(name = "auth")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthEntity extends BaseEntity {
 
     @Column(name = "email", nullable = false, unique = true)

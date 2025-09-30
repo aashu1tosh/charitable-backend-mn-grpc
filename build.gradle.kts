@@ -36,6 +36,8 @@ dependencies {
 
     //security (for bcrypt)
     implementation("org.springframework.security:spring-security-crypto:6.1.5")
+    // for logging with spring implementation
+    implementation("org.springframework:spring-jcl:5.3.25")
 
     // for cli (like seeding db)
     implementation("io.micronaut.picocli:micronaut-picocli")
@@ -127,10 +129,10 @@ tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative"
     jdkVersion = "21"
 }
 
-tasks.register<JavaExec>("seedSudoAdmin") {
+tasks.register<JavaExec>("runSeeder") {
     group = "application"
-    description = "Seed sudo admin users"
+    description = "Runs the seeder command"
     classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("org.charitable.app.infrastructure.command.SeedCommand")
-    args("--admin")
+    mainClass = "org.charitable.app.infrastructure.command.SeedCommand"
+//    args("seed-admin")
 }
