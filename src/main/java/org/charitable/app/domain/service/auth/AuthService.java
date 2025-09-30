@@ -5,18 +5,21 @@ import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.response.AppResponse;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.domain.port.outbound.AuthRepository;
+import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
 class AuthService implements AuthUseCase {
-
-    private final AuthRepository authRepository;
     private static final Logger logger = LoggerFactory.getLogger(AuthGrpcService.class);
 
-    public AuthService(AuthRepository authRepository) {
+    private final AuthRepository authRepository;
+    private final PasswordHash passwordHash;
+
+    public AuthService(AuthRepository authRepository, PasswordHash passwordHash) {
         this.authRepository = authRepository;
+        this.passwordHash = passwordHash;
     }
 
     public AppResponse<String> login(LoginRequestDTO data) {
@@ -26,7 +29,7 @@ class AuthService implements AuthUseCase {
 
         logger.info("Found auth for user: {}", auth);
 
-        if (auth.isEmpty() || !auth.get().getPassword().equals(data.getPassword())) {
+        if (auth.isEmpty() || !passwordHash.matches(data.getPassword(), auth.get().getPassword())) {
             return new AppResponse<>(false, "Invalid email or password", "");
         }
 
