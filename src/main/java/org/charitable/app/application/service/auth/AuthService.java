@@ -55,17 +55,17 @@ class AuthService implements AuthUseCase {
             return new AppResponse<>(false, "Email already in use", "");
         }
 
-        var org = new Organization(
-                organization.getName(),
-                organization.getAddress(),
-                organization.getLatitude(),
-                organization.getLongitude(),
-                organization.getGovtId(),
-                organization.getContactNumber(),
-                null
-        );
+//        var org = new Organization(
+//                organization.getName(),
+//                organization.getAddress(),
+//                organization.getLatitude(),
+//                organization.getLongitude(),
+//                organization.getGovtId(),
+//                organization.getContactNumber(),
+//                null
+//        );
 
-        var savedOrg = organizationService.register(org);
+        var savedOrg = organizationService.register(organization);
 
         String hashedPassword = passwordHash.hash(data.getPassword());
 

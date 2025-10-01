@@ -3,6 +3,7 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.organization;
 import jakarta.inject.Singleton;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.port.outbound.organization.OrganizationRepository;
+import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -44,19 +45,6 @@ class OrganizationRepositoryImpl implements OrganizationRepository {
 
 
     private Organization mapToDomain(OrganizationEntity organizationEntity) {
-        var org = new Organization(
-                organizationEntity.getName(),
-                organizationEntity.getAddress(),
-                organizationEntity.getLatitude(),
-                organizationEntity.getLongitude(),
-                organizationEntity.getGovtId(),
-                organizationEntity.getContactNumber(),
-                null
-        );
-
-        org.setId(organizationEntity.getId());
-        org.setCreatedAt(organizationEntity.getCreatedAt());
-        org.setUpdatedAt(organizationEntity.getUpdatedAt());
-        return org;
+        return OrganizationMapper.mapToDomain(organizationEntity);
     }
 }

@@ -116,11 +116,11 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
                 contactNumber
         );
 
-        authUseCase.registerOrganization(auth, org);
+        var resp = authUseCase.registerOrganization(auth, org);
 
         CommonResponse response = CommonResponse.newBuilder()
-                .setSuccess(true)
-                .setMessage("Organization registered successfully")
+                .setSuccess(resp.isSuccess())
+                .setMessage(resp.getMessage())
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

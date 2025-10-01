@@ -5,6 +5,7 @@ import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
+import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ class AuthRepositoryImpl implements AuthRepository {
                 auth.getRole(),
                 auth.getIsEmailVerified(),
                 auth.getStatus(),
-                null
+                OrganizationMapper.mapToEntitySafe(auth.getOrganization())
         );
         var savedEntity = jpaRepository.save(entity);
         logger.info("Saved user: {}", savedEntity);
