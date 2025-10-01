@@ -6,10 +6,10 @@ import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.dto.response.AppResponse;
+import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
 import org.charitable.app.domain.entity.auth.Auth;
-import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
@@ -52,18 +52,8 @@ class AuthService implements AuthUseCase {
 
         var existingAuth = authRepository.findByEmail(data.getEmail());
         if (existingAuth.isPresent()) {
-            return new AppResponse<>(false, "Email already in use", "");
+            throw AppException.badRequest("Email already in use");
         }
-
-//        var org = new Organization(
-//                organization.getName(),
-//                organization.getAddress(),
-//                organization.getLatitude(),
-//                organization.getLongitude(),
-//                organization.getGovtId(),
-//                organization.getContactNumber(),
-//                null
-//        );
 
         var savedOrg = organizationService.register(organization);
 

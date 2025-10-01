@@ -7,6 +7,8 @@ import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
 import io.grpc.Status;
 import jakarta.inject.Singleton;
+import org.charitable.app.application.exception.AppException;
+import org.charitable.app.infrastructure.adapter.inbound.grpc.GrpcExceptionMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +32,22 @@ public class GlobalGrpcExceptionInterceptor implements ServerInterceptor {
                 try {
                     super.onHalfClose();
                 } catch (Exception e) {
-                    logger.info("Exception caught in gRPC call: {}", e.getMessage(), e);
-                    call.close(
-                            Status.INTERNAL.withDescription("Oops! Something went wrong."),
-                            new Metadata());
+                    if (e instanceof AppException appEx) {
+                        logger.warn("AppException caught in gRPC call: {}", appEx.getMessage());
+                        call.close(
+                                GrpcExceptionMapper.toGrpc(appEx).getStatus(),
+                                new Metadata()
+                        );
+                    } else {
+                        logger.error("Unexpected exception in gRPC call: {}", e.getMessage(), e);
+                        call.close(
+                                Status.INTERNAL.withDescription("Oops! Something went wrong.").withCause(e),
+                                new Metadata()
+                        );
+                    }
                 }
             }
         };
     }
 }
+
