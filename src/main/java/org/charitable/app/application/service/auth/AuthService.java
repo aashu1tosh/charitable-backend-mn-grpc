@@ -1,5 +1,6 @@
 package org.charitable.app.application.service.auth;
 
+import io.micronaut.transaction.annotation.TransactionalEventListener;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
@@ -12,13 +13,12 @@ import org.charitable.app.application.port.inbound.organization.OrganizationUseC
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
-import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
 class AuthService implements AuthUseCase {
-    private static final Logger logger = LoggerFactory.getLogger(AuthGrpcService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final AuthRepository authRepository;
     private final PasswordHash passwordHash;
@@ -71,6 +71,33 @@ class AuthService implements AuthUseCase {
         var newAuth = authRepository.save(auth);
 
         logger.info("Registered new organization with ID: {}", newAuth.getId());
+
+        return new AppResponse<String>(true, "Registration successful", "dummy-token-for-" + newAuth.getId());
+    }
+
+    @Transactional
+    public AppResponse<String> registerUser(AuthRegisterRequestDTO data, org.charitable.app.application.port.inbound.user.UserRegisterRequestDTO user) {
+        logger.info("Service register user for email: {}", data.getEmail());
+
+        var existingAuth = authRepository.findByEmail(data.getEmail());
+        if (existingAuth.isPresent()) {
+            throw AppException.badRequest("Email already in use");
+        }
+
+        String hashedPassword = passwordHash.hash(data.getPassword());
+
+        var auth = new Auth(
+                data.getEmail(),
+                hashedPassword,
+                data.getPhone(),
+                data.getRole(),
+                false,
+                data.getStatus(),
+                null
+        );
+        var newAuth = authRepository.save(auth);
+
+        logger.info("Registered new user with ID: {}", newAuth.getId());
 
         return new AppResponse<String>(true, "Registration successful", "dummy-token-for-" + newAuth.getId());
     }

@@ -7,11 +7,14 @@ import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
 import io.grpc.Status;
 import jakarta.inject.Singleton;
+import jakarta.validation.ConstraintViolationException;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.GrpcExceptionMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.stream.Collectors;
 
 @Singleton
 public class GlobalGrpcExceptionInterceptor implements ServerInterceptor {
@@ -31,23 +34,27 @@ public class GlobalGrpcExceptionInterceptor implements ServerInterceptor {
             public void onHalfClose() {
                 try {
                     super.onHalfClose();
-                } catch (Exception e) {
-                    if (e instanceof AppException appEx) {
-                        logger.warn("AppException caught in gRPC call: {}", appEx.getMessage());
-                        call.close(
-                                GrpcExceptionMapper.toGrpc(appEx).getStatus(),
-                                new Metadata()
-                        );
-                    } else {
-                        logger.error("Unexpected exception in gRPC call: {}", e.getMessage(), e);
-                        call.close(
-                                Status.INTERNAL.withDescription("Oops! Something went wrong.").withCause(e),
-                                new Metadata()
-                        );
-                    }
+                } catch (AppException appEx) {
+                    logger.warn("AppException caught in gRPC call: {}", appEx.getMessage());
+                    call.close(GrpcExceptionMapper.toGrpc(appEx).getStatus(), new Metadata());
+                }
+                catch (ConstraintViolationException cve) {
+                    logger.warn("Validation exception in gRPC call: {}", cve.getMessage());
+                    String message = cve.getConstraintViolations().stream()
+                            .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
+                            .collect(Collectors.joining(", "));
+                    call.close(
+                            Status.INVALID_ARGUMENT.withDescription(message),
+                            new Metadata()
+                    );
+                }catch (Exception e) {
+                    logger.error("Unexpected exception in gRPC call: {}", e.getMessage(), e);
+                    call.close(
+                            Status.INTERNAL.withDescription("Oops! Something went wrong.").withCause(e),
+                            new Metadata()
+                    );
                 }
             }
         };
     }
 }
-
