@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.charitable.app.domain.entity.base.Base;
 import org.charitable.app.domain.entity.organization.Organization;
+import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
 
@@ -19,4 +20,5 @@ public class Auth extends Base {
     private Boolean isEmailVerified;
     private AuthStatus status;
     private Organization organization;
+    private User user;
 }

@@ -6,10 +6,12 @@ import jakarta.transaction.Transactional;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
+import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.dto.response.AppResponse;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
+import org.charitable.app.application.port.inbound.user.UserUseCase;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
@@ -23,11 +25,13 @@ class AuthService implements AuthUseCase {
     private final AuthRepository authRepository;
     private final PasswordHash passwordHash;
     private final OrganizationUseCase organizationService;
+    private final UserUseCase userService;
 
-    public AuthService(AuthRepository authRepository, PasswordHash passwordHash, OrganizationUseCase organizationService) {
+    public AuthService(AuthRepository authRepository, PasswordHash passwordHash, OrganizationUseCase organizationService, UserUseCase userService) {
         this.authRepository = authRepository;
         this.passwordHash = passwordHash;
         this.organizationService = organizationService;
+        this.userService = userService;
     }
 
     public AppResponse<String> login(LoginRequestDTO data) {
@@ -66,7 +70,8 @@ class AuthService implements AuthUseCase {
                 data.getRole(),
                 false,
                 data.getStatus(),
-                savedOrg
+                savedOrg,
+                null
         );
         var newAuth = authRepository.save(auth);
 
@@ -76,7 +81,7 @@ class AuthService implements AuthUseCase {
     }
 
     @Transactional
-    public AppResponse<String> registerUser(AuthRegisterRequestDTO data, org.charitable.app.application.port.inbound.user.UserRegisterRequestDTO user) {
+    public AppResponse<String> registerUser(AuthRegisterRequestDTO data, UserRegisterRequestDTO user) {
         logger.info("Service register user for email: {}", data.getEmail());
 
         var existingAuth = authRepository.findByEmail(data.getEmail());
@@ -84,6 +89,7 @@ class AuthService implements AuthUseCase {
             throw AppException.badRequest("Email already in use");
         }
 
+        var savedUser = userService.register(user);
         String hashedPassword = passwordHash.hash(data.getPassword());
 
         var auth = new Auth(
@@ -93,9 +99,12 @@ class AuthService implements AuthUseCase {
                 data.getRole(),
                 false,
                 data.getStatus(),
-                null
+                null,
+                savedUser
         );
         var newAuth = authRepository.save(auth);
+
+
 
         logger.info("Registered new user with ID: {}", newAuth.getId());
 

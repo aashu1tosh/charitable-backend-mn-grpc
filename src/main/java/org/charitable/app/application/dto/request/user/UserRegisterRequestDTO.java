@@ -1,4 +1,4 @@
-package org.charitable.app.application.port.inbound.user;
+package org.charitable.app.application.dto.request.user;
 
 import io.micronaut.core.annotation.Introspected;
 import jakarta.validation.constraints.NotBlank;

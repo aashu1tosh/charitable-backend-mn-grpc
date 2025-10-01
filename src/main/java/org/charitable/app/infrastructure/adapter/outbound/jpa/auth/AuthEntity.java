@@ -10,6 +10,7 @@ import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
 
 @Entity
 @Table(name = "auth")
@@ -45,9 +46,14 @@ public class AuthEntity extends BaseEntity {
     @Column(name = "status", nullable = false)
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private AuthStatus status = AuthStatus.ACTIVE;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "organization_id", nullable = true)
     private OrganizationEntity organization;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "user_id", nullable = true)
+    private UserEntity user;
 }

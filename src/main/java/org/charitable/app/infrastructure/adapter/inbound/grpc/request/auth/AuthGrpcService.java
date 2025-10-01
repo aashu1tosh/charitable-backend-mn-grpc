@@ -1,17 +1,13 @@
 package org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth;
 
 import io.grpc.stub.StreamObserver;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
-import org.charitable.app.application.exception.AppException;
+import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
-import org.charitable.app.application.port.inbound.user.UserRegisterRequestDTO;
 import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
