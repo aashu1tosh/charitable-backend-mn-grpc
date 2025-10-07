@@ -48,6 +48,9 @@ dependencies {
     // Security
     implementation("io.micronaut.security:micronaut-security:4.11.5")
 
+    // jwt security
+    implementation("io.micronaut.security:micronaut-security-jwt")
+
     // Serialization
     implementation("io.micronaut.serde:micronaut-serde-jackson:2.12.0")
 

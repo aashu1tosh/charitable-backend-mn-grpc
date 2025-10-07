@@ -1,6 +1,5 @@
 package org.charitable.app.application.service.auth;
 
-import io.micronaut.transaction.annotation.TransactionalEventListener;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
@@ -12,7 +11,9 @@ import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
 import org.charitable.app.application.port.inbound.user.UserUseCase;
+import org.charitable.app.application.port.outbound.authToken.AuthTokenImpl;
 import org.charitable.app.domain.entity.auth.Auth;
+import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.slf4j.Logger;
@@ -26,15 +27,22 @@ class AuthService implements AuthUseCase {
     private final PasswordHash passwordHash;
     private final OrganizationUseCase organizationService;
     private final UserUseCase userService;
+    private final AuthTokenImpl tokenService;
 
-    public AuthService(AuthRepository authRepository, PasswordHash passwordHash, OrganizationUseCase organizationService, UserUseCase userService) {
+    public AuthService(
+            AuthRepository authRepository,
+            PasswordHash passwordHash,
+            OrganizationUseCase organizationService,
+            UserUseCase userService,
+            AuthTokenImpl tokenService) {
         this.authRepository = authRepository;
         this.passwordHash = passwordHash;
         this.organizationService = organizationService;
         this.userService = userService;
+        this.tokenService = tokenService;
     }
 
-    public AppResponse<String> login(LoginRequestDTO data) {
+    public AppResponse<?> login(LoginRequestDTO data) {
         logger.info("Service login for user: {}", data.getUsername());
 
         var auth = authRepository.findByEmail(data.getUsername());
@@ -45,9 +53,9 @@ class AuthService implements AuthUseCase {
             return new AppResponse<>(false, "Invalid email or password", "");
         }
 
-        String token = "dummy-token-for-" + auth.get().getId();
+        var token = tokenService.generateToken(auth.get());
         logger.info("New token for user: {}", token);
-        return new AppResponse<String>(true, "Login successful", token);
+        return new AppResponse<IdentityTokens>(true, "Login successful", token);
     }
 
     @Transactional

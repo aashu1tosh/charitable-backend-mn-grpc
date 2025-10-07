@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.base.Base;
+import org.charitable.app.domain.model.Role;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 
 @Getter

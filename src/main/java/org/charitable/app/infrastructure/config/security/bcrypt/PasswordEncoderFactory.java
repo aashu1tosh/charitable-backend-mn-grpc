@@ -1,4 +1,4 @@
-package org.charitable.app.infrastructure.config.security;
+package org.charitable.app.infrastructure.config.security.bcrypt;
 
 import io.micronaut.context.annotation.Factory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

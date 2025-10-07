@@ -1,4 +1,4 @@
-package org.charitable.app.infrastructure.config.security;
+package org.charitable.app.infrastructure.config.security.bcrypt;
 
 import jakarta.inject.Singleton;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
