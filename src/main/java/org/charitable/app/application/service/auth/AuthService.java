@@ -123,7 +123,8 @@ class AuthService implements AuthUseCase {
 
     public AppResponse<Auth> myInfo(UUID authId) {
         logger.info("Service myInfo for authId: {}", authId);
-
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30";
+        var check = tokenService.validateAccessToken(token);
         var auth = authRepository.findById(authId)
                 .orElseThrow(() -> AppException.notFound("Auth not found"));
 

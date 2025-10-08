@@ -1,25 +1,32 @@
 package org.charitable.app.infrastructure.config.security.jwt;
 
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
+import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.AllArgsConstructor;
+import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenImpl;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
 
+import java.text.ParseException;
 import java.util.*;
 
 @Singleton
 @AllArgsConstructor
-public class JwtGenerator implements AuthTokenImpl {
+class JwtProvider implements AuthTokenImpl {
 
     @Named("access")
     private final JwtTokenGenerator accessTokenGenerator;
 
     @Named("refresh")
     private final JwtTokenGenerator refreshTokenGenerator;
+
+
 
     @Override
     public IdentityTokens generateToken(Auth auth) {
@@ -42,5 +49,10 @@ public class JwtGenerator implements AuthTokenImpl {
                 accessToken.orElseThrow(() -> new RuntimeException("Failed to generate access token")),
                 refreshToken.orElseThrow(() -> new RuntimeException("Failed to generate refresh token"))
         );
+    }
+
+    @Override
+    public String validateAccessToken(String token) {
+        return  "pass";
     }
 }

@@ -1,6 +1,8 @@
 package org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth;
 
 import io.grpc.stub.StreamObserver;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
@@ -8,6 +10,7 @@ import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
+import org.charitable.app.application.port.outbound.authToken.AuthTokenImpl;
 import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.model.Role;
@@ -142,10 +145,12 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     public void myInfo(EmptyRequest request, StreamObserver<CommonResponse> responseObserver) {
         logger.info("Receive my info request");
         var id = UUIDUtils.stringToUUID("901016cb-2b20-4945-8089-34ed27fd856e");
         authUseCase.myInfo(id);
+
         CommonResponse response = CommonResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("My info retrieved successfully")
@@ -153,6 +158,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
     @Override
     public void logout(LogoutRequest request, @NotNull StreamObserver<CommonResponse> responseObserver) {
         CommonResponse response = CommonResponse.newBuilder()
