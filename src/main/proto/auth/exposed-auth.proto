@@ -10,6 +10,8 @@ service AuthService {
   rpc Login (LoginRequest) returns (CommonResponse);
   rpc RegisterUser (RegisterUserRequest) returns (CommonResponse);
   rpc RegisterOrganization (RegisterOrganizationRequest) returns (CommonResponse);
+
+  rpc MyInfo(EmptyRequest) returns (CommonResponse);
   rpc Logout (LogoutRequest) returns (CommonResponse);
 }
 

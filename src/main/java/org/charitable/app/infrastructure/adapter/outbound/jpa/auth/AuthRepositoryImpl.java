@@ -34,8 +34,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
-    public Optional<Auth> findById(String id) {
-        return jpaRepository.findById(UUID.fromString(id))
+    public Optional<Auth> findById(UUID id) {
+        return jpaRepository.findById(id)
                 .map(AuthRepositoryImpl::mapToDomain);
     }
 

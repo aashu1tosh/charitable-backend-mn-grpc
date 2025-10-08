@@ -19,6 +19,8 @@ import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 @Singleton
 class AuthService implements AuthUseCase {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
@@ -117,5 +119,15 @@ class AuthService implements AuthUseCase {
         logger.info("Registered new user with ID: {}", newAuth.getId());
 
         return new AppResponse<String>(true, "Registration successful", "dummy-token-for-" + newAuth.getId());
+    }
+
+    public AppResponse<Auth> myInfo(UUID authId) {
+        logger.info("Service myInfo for authId: {}", authId);
+
+        var auth = authRepository.findById(authId)
+                .orElseThrow(() -> AppException.notFound("Auth not found"));
+
+        logger.info("My Information auth: {}", auth.getEmail());
+        return new AppResponse<Auth>(true, "Information fetched Successfully", auth);
     }
 }
