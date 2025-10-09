@@ -15,6 +15,7 @@ import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
+import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticated;
 import org.charitable.app.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,11 +146,11 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
-    @Secured(SecurityRule.IS_AUTHENTICATED)
+    @GrpcAuthenticated
     public void myInfo(EmptyRequest request, StreamObserver<CommonResponse> responseObserver) {
         logger.info("Receive my info request");
-        var id = UUIDUtils.stringToUUID("901016cb-2b20-4945-8089-34ed27fd856e");
-        authUseCase.myInfo(id);
+//        var id = UUIDUtils.stringToUUID("901016cb-2b20-4945-8089-34ed27fd856e");
+//        authUseCase.myInfo(id);
 
         CommonResponse response = CommonResponse.newBuilder()
                 .setSuccess(true)

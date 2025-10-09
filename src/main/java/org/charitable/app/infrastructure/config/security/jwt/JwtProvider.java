@@ -2,8 +2,10 @@ package org.charitable.app.infrastructure.config.security.jwt;
 
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
+import com.nimbusds.jwt.SignedJWT;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
+import io.micronaut.security.token.jwt.validator.JwtAuthenticationFactory;
 import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -20,13 +22,15 @@ import java.util.*;
 @AllArgsConstructor
 class JwtProvider implements AuthTokenImpl {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(JwtProvider.class);
+
     @Named("access")
     private final JwtTokenGenerator accessTokenGenerator;
 
     @Named("refresh")
     private final JwtTokenGenerator refreshTokenGenerator;
 
-
+    private final JwtAuthenticationFactory jwtAuthenticationFactory;
 
     @Override
     public IdentityTokens generateToken(Auth auth) {
@@ -51,8 +55,27 @@ class JwtProvider implements AuthTokenImpl {
         );
     }
 
+
     @Override
     public String validateAccessToken(String token) {
-        return  "pass";
+        try {
+            logger.info("Provided token: " + token);
+            // Parse the token
+            SignedJWT signedJWT = SignedJWT.parse(token);
+
+            // Use Micronaut's factory to validate and create Authentication
+            Optional<Authentication> authentication = jwtAuthenticationFactory.createAuthentication(signedJWT);
+
+            if (authentication.isEmpty()) {
+                throw AppException.unauthorized("Invalid or expired token");
+            }
+
+            // Extract the ID from authentication attributes
+            Map<String, Object> attributes = authentication.get().getAttributes();
+            return attributes.get("id").toString();
+
+        } catch (ParseException e) {
+            throw AppException.unauthorized("Malformed token");
+        }
     }
 }
