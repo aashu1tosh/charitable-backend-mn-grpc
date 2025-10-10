@@ -76,13 +76,12 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
 
             log.debug("Raw authorization header: {}", authHeader);
 
-            // Remove "Bearer " prefix if present
-//            if (authHeader.startsWith(BEARER_PREFIX)) {
-//                return authHeader.substring(BEARER_PREFIX.length());
-//            }
+//             Remove "Bearer " prefix if present
+            if (authHeader.startsWith(BEARER_PREFIX)) {
+                return authHeader.substring(BEARER_PREFIX.length());
+            }
 
-            return authHeader;
-
+            return null;
         } catch (Exception e) {
             log.error("Error extracting token from metadata", e);
             return null;
