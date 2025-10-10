@@ -1,8 +1,10 @@
 package org.charitable.app.infrastructure.config.security.jwt;
 
+import com.nimbusds.jwt.SignedJWT;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
-import io.micronaut.security.token.jwt.validator.JwtValidator;
+import io.micronaut.security.token.jwt.validator.JwtAuthenticationFactory;
+import io.micronaut.security.token.jwt.validator.ReactiveJsonWebTokenValidator;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,7 @@ import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
 
+import java.text.ParseException;
 import java.util.*;
 
 @Singleton
@@ -25,13 +28,14 @@ class JwtProvider implements AuthTokenManager {
     @Named("refresh")
     private final JwtTokenGenerator refreshTokenGenerator;
 
+    private final JwtAuthenticationFactory jwtAuthenticationFactory;
+
     @Named("access")
-    private final JwtValidator accessTokenValidator;
-
-
+    private final ReactiveJsonWebTokenValidator accessTokenValidator;
 
     @Override
     public IdentityTokens generateToken(Auth auth) {
+
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("id", auth.getId());
         attributes.put("role", auth.getRole());
@@ -41,8 +45,9 @@ class JwtProvider implements AuthTokenManager {
         var roles = Collections.singletonList(auth.getRole().toString());
 
         Authentication authentication = Authentication.build(auth.getId().toString(), roles, attributes);
-
+        // expiration will be injected from configuration
         Optional<String> accessToken = accessTokenGenerator.generateToken(authentication, null);
+
         Optional<String> refreshToken = refreshTokenGenerator.generateToken(authentication, null);
 
         return new IdentityTokens(
@@ -51,13 +56,16 @@ class JwtProvider implements AuthTokenManager {
         );
     }
 
+
     @Override
     public String validateAccessToken(String token) {
         try {
-            logger.info("Validating token: " + token);
+            logger.info("Provided token: " + token);
+            // Parse the token
+            SignedJWT signedJWT = SignedJWT.parse(token);
 
-            // This validates the signature AND expiration
-            Optional<Authentication> authentication = accessTokenValidator.validate(token, null);
+            // Use Micronaut's factory to validate and create Authentication
+            Optional<Authentication> authentication = jwtAuthenticationFactory.createAuthentication(signedJWT);
 
             if (authentication.isEmpty()) {
                 throw AppException.unauthorized("Invalid or expired token");
@@ -66,17 +74,11 @@ class JwtProvider implements AuthTokenManager {
             // Extract the ID from authentication attributes
             Map<String, Object> attributes = authentication.get().getAttributes();
             logger.info("Authentication attributes: " + attributes);
+            return attributes.get("id").toString();
 
-            Object idObj = attributes.get("id");
-            if (idObj == null) {
-                throw AppException.unauthorized("Token missing required 'id' claim");
-            }
-
-            return idObj.toString();
-
-        } catch (Exception e) {
-            logger.error("Token validation failed", e);
-            throw AppException.unauthorized("Invalid token: " + e.getMessage());
+        } catch (ParseException e) {
+            throw AppException.unauthorized("Malformed token");
         }
     }
+
 }
