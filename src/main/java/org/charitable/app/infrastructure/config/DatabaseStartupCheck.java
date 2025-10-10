@@ -1,8 +1,10 @@
 package org.charitable.app.infrastructure.config;
 
+import io.micronaut.context.env.Environment;
 import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.context.event.StartupEvent;
 import jakarta.inject.Singleton;
+import org.charitable.app.infrastructure.config.environment.EnvVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +21,10 @@ class DatabaseStartupCheck implements ApplicationEventListener<StartupEvent> {
     private final String password;
 
     public DatabaseStartupCheck(
-            io.micronaut.context.env.Environment environment) {
-        this.url = environment.getProperty("datasources.default.url", String.class).orElse("");
-        this.username = environment.getProperty("datasources.default.username", String.class).orElse("");
-        this.password = environment.getProperty("datasources.default.password", String.class).orElse("");
+            EnvVariables environment) {
+        this.url = environment.getDataSourceUrl();
+        this.username = environment.getDataSourceUsername();
+        this.password = environment.getDataSourcePassword();
     }
 
     @Override

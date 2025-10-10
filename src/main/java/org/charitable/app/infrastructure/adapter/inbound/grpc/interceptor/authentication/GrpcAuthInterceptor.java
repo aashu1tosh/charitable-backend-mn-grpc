@@ -8,8 +8,12 @@ import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
+import org.charitable.app.domain.model.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor
@@ -42,14 +46,19 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
             throw AppException.unauthorized("Authorization token is required");
         }
 
-        // Print the token
-        log.info("Extracted token: {}", token);
-        System.out.println("Token from header: " + token);
-
         try {
-            // Proceed with the original method execution
-            authTokenService.validateAccessToken(token);
+            var id = authTokenService.validateAccessToken(token);
+
+            if(annotation != null) {
+                Optional<Role[]> requiredRoles  = annotation.get("roles", Role[].class);
+                if (requiredRoles.isPresent() && requiredRoles.get().length > 0) {
+                    System.out.println("Required roles: "+ Arrays.toString(requiredRoles.get()));
+                }
+            }
+
+            context.setAttribute("id", id);
             return context.proceed();
+
         } finally {
             log.debug("Completed method execution");
         }

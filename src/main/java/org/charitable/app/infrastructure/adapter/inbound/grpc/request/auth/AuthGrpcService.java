@@ -16,8 +16,6 @@ import org.charitable.app.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
 @Singleton
 public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 
@@ -142,7 +140,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
-    @GrpcAuthenticated
+    @GrpcAuthenticated(roles = {Role.SUDO_ADMIN})
     public void myInfo(EmptyRequest request, StreamObserver<CommonResponse> responseObserver) {
         logger.info("Receive my info request");
 //        var id = UUIDUtils.stringToUUID("901016cb-2b20-4945-8089-34ed27fd856e");

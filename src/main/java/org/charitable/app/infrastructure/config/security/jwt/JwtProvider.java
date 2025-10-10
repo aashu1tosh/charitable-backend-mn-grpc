@@ -1,5 +1,7 @@
 package org.charitable.app.infrastructure.config.security.jwt;
 
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.SignedJWT;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
@@ -12,6 +14,7 @@ import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
+import org.charitable.app.infrastructure.config.environment.EnvVariables;
 
 import java.text.ParseException;
 import java.util.*;
@@ -30,8 +33,7 @@ class JwtProvider implements AuthTokenManager {
 
     private final JwtAuthenticationFactory jwtAuthenticationFactory;
 
-    @Named("access")
-    private final ReactiveJsonWebTokenValidator accessTokenValidator;
+    private final EnvVariables envVariables;
 
     @Override
     public IdentityTokens generateToken(Auth auth) {
@@ -61,24 +63,37 @@ class JwtProvider implements AuthTokenManager {
     public String validateAccessToken(String token) {
         try {
             logger.info("Provided token: " + token);
-            // Parse the token
+
+            // 1️⃣ Parse the token
             SignedJWT signedJWT = SignedJWT.parse(token);
 
-            // Use Micronaut's factory to validate and create Authentication
+            var jwtSecret = envVariables.getJwtAccessTokenSecret();
+            JWSVerifier verifier = new MACVerifier(jwtSecret);
+            boolean validSignature = signedJWT.verify(verifier);
+
+            if (!validSignature) {
+                throw AppException.unauthorized("Invalid token signature");
+            }
+
+            if (signedJWT.getJWTClaimsSet().getExpirationTime() != null &&
+                    signedJWT.getJWTClaimsSet().getExpirationTime().before(new java.util.Date())) {
+                throw AppException.unauthorized("Token has expired");
+            }
+
             Optional<Authentication> authentication = jwtAuthenticationFactory.createAuthentication(signedJWT);
 
             if (authentication.isEmpty()) {
                 throw AppException.unauthorized("Invalid or expired token");
             }
 
-            // Extract the ID from authentication attributes
             Map<String, Object> attributes = authentication.get().getAttributes();
             logger.info("Authentication attributes: " + attributes);
-            return attributes.get("id").toString();
 
+            return attributes.get("id").toString();
         } catch (ParseException e) {
             throw AppException.unauthorized("Malformed token");
+        } catch (Exception e) {
+            throw AppException.internal("Error validating token: " + e.getMessage());
         }
     }
-
 }
