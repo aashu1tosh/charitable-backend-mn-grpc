@@ -5,5 +5,5 @@ import org.charitable.app.domain.entity.auth.IdentityTokens;
 
 public interface AuthTokenManager {
     IdentityTokens generateToken(Auth auth);
-    String validateAccessToken(String token);
+    String it validateAccessToken(String token);
 }
