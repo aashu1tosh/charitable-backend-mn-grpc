@@ -11,7 +11,7 @@ import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
 import org.charitable.app.application.port.inbound.user.UserUseCase;
-import org.charitable.app.application.port.outbound.authToken.AuthTokenImpl;
+import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
@@ -29,14 +29,14 @@ class AuthService implements AuthUseCase {
     private final PasswordHash passwordHash;
     private final OrganizationUseCase organizationService;
     private final UserUseCase userService;
-    private final AuthTokenImpl tokenService;
+    private final AuthTokenManager tokenService;
 
     public AuthService(
             AuthRepository authRepository,
             PasswordHash passwordHash,
             OrganizationUseCase organizationService,
             UserUseCase userService,
-            AuthTokenImpl tokenService) {
+            AuthTokenManager tokenService) {
         this.authRepository = authRepository;
         this.passwordHash = passwordHash;
         this.organizationService = organizationService;

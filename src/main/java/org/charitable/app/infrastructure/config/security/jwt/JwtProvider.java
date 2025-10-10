@@ -1,17 +1,14 @@
 package org.charitable.app.infrastructure.config.security.jwt;
 
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
 import io.micronaut.security.token.jwt.validator.JwtAuthenticationFactory;
-import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.AllArgsConstructor;
 import org.charitable.app.application.exception.AppException;
-import org.charitable.app.application.port.outbound.authToken.AuthTokenImpl;
+import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
 
@@ -20,7 +17,7 @@ import java.util.*;
 
 @Singleton
 @AllArgsConstructor
-class JwtProvider implements AuthTokenImpl {
+class JwtProvider implements AuthTokenManager {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(JwtProvider.class);
 
