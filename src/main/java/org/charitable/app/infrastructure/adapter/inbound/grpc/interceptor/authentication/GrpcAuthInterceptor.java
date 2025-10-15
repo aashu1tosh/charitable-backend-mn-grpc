@@ -12,8 +12,10 @@ import org.charitable.app.domain.model.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor
@@ -47,18 +49,29 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
         }
 
         try {
-            var id = authTokenService.validateAccessToken(token);
+            var tokenPayload = authTokenService.validateAccessToken(token);
 
             if(annotation != null) {
                 Optional<Role[]> requiredRoles  = annotation.get("roles", Role[].class);
                 if (requiredRoles.isPresent() && requiredRoles.get().length > 0) {
                     System.out.println("Required roles: "+ Arrays.toString(requiredRoles.get()));
+                    var role = tokenPayload.getRole();
+                    boolean containsRole = Arrays.stream(requiredRoles.get())
+                            .anyMatch(r -> r == role);
+
+                    if(!containsRole) {
+                        throw AppException.unauthorized("You are not authorized to access this resource");
+                    }
                 }
             }
 
-            context.setAttribute("id", id);
+            context.setAttribute("TokenPayload", tokenPayload);
             return context.proceed();
-
+        } catch (AppException e) {
+            throw AppException.unauthorized(e.getMessage());
+        } catch (Exception ex) {
+            log.error("Exception while processing GrpcAuthenticated annotation", ex);
+            throw AppException.unauthorized("Authentication failed");
         } finally {
             log.debug("Completed method execution");
         }
