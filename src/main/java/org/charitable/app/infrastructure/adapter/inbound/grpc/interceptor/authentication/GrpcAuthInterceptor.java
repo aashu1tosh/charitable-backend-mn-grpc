@@ -12,10 +12,8 @@ import org.charitable.app.domain.model.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor

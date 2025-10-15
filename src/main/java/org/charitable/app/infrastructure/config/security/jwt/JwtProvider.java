@@ -92,6 +92,7 @@ class JwtProvider implements AuthTokenManager {
             Map<String, Object> attributes = authentication.get().getAttributes();
             logger.info("Authentication attributes: " + attributes);
 
+
             var tokenPayload = TokenPayload.builder()
                     .id((UUID) UUIDUtils.stringToUUID(attributes.get("id").toString()))
                     .role(Role.valueOf(attributes.get("role").toString()))
