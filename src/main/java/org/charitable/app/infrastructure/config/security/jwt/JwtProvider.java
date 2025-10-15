@@ -12,8 +12,11 @@ import jakarta.inject.Singleton;
 import lombok.AllArgsConstructor;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
+import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
+import org.charitable.app.domain.model.Role;
+import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.infrastructure.config.environment.EnvVariables;
 
 import java.text.ParseException;
@@ -60,7 +63,7 @@ class JwtProvider implements AuthTokenManager {
 
 
     @Override
-    public String validateAccessToken(String token) {
+    public TokenPayload validateAccessToken(String token) {
         try {
             logger.info("Provided token: " + token);
 
@@ -89,7 +92,15 @@ class JwtProvider implements AuthTokenManager {
             Map<String, Object> attributes = authentication.get().getAttributes();
             logger.info("Authentication attributes: " + attributes);
 
-            return attributes.get("id").toString();
+            var tokenPayload = TokenPayload.builder()
+                    .id((UUID) attributes.get("id"))
+                    .role((Role) attributes.get("roles"))
+                    .organizationId(attributes.get("organizationId") != null ? (UUID) attributes.get("organizationId") : null)
+                    .adminId(attributes.get("adminId") != null ? (UUID) attributes.get("adminId") : null)
+                    .userId(attributes.get("userId") != null ? (UUID) attributes.get("userId") : null)
+                    .build();
+
+            return tokenPayload;
         } catch (ParseException e) {
             throw AppException.unauthorized("Malformed token");
         } catch (Exception e) {
