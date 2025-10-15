@@ -17,6 +17,7 @@ public class AuthenticatedUserArgumentBinder implements ArgumentBinder<TokenPayl
             ArgumentConversionContext<TokenPayload> context,
             MethodInvocationContext<?, ?> source) {
 
+        if (!context.getArgument().isAnnotationPresent(AuthenticatedUser.class)) {
             return BindingResult.UNSATISFIED;
         }
 
