@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.charitable.app.proto";
+option java_outer_classname = "AuthProto";
+
+import "exposed-common.proto";
+
+service AuthService {
+  rpc Login (LoginRequest) returns (CommonResponse);
+  rpc RegisterUser (RegisterUserRequest) returns (CommonResponse);
+  rpc RegisterOrganization (RegisterOrganizationRequest) returns (CommonResponse);
+
+  rpc MyInfo(EmptyRequest) returns (CommonResponse);
+  rpc Logout (LogoutRequest) returns (CommonResponse);
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+
+message RegisterUserRequest {
+  string email = 1;
+  string password = 2;
+  string phone_number = 3;
+
+  string firstName = 4;
+  string middleName = 5;
+  string lastName = 6;
+  float latitude = 7;
+  float longitude = 8;
+}
+
+message RegisterOrganizationRequest {
+  string email = 4;
+  string password = 3;
+  string phone_number = 2;
+
+  string organization_name = 1;
+  string address = 5;
+  float latitude = 6;
+  float longitude = 7;
+  string govt_id = 8;
+  string contact_number = 9;
+}
+
+
+message LogoutRequest {}

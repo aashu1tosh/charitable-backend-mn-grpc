@@ -11,33 +11,81 @@ group = "org.charitable.app"
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
-    annotationProcessor("io.micronaut:micronaut-http-validation")
-    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-    implementation("io.micronaut:micronaut-discovery-core")
-    implementation("io.micronaut.grpc:micronaut-grpc-runtime")
-    implementation("io.micronaut.serde:micronaut-serde-jackson")
-    implementation("javax.annotation:javax.annotation-api")
+    // Annotation processors - use compatible versions
+    annotationProcessor("io.micronaut:micronaut-http-validation:4.9.4")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor:2.12.0")
+
+    // PostgreSQL JDBC Driver
+    runtimeOnly("org.postgresql:postgresql:42.7.3")
+
+    // Micronaut Data JDBC
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari:5.7.0")
+
+
+    // Core Micronaut dependencies - use 4.9.4 for consistency
+    implementation("io.micronaut:micronaut-discovery-core:4.9.4")
+    implementation("io.micronaut.grpc:micronaut-grpc-runtime:4.11.0")
+    implementation("io.micronaut.validation:micronaut-validation:4.9.0")
+
+    // for server reflection
+    implementation("io.grpc:grpc-services")
+
+    //security (for bcrypt)
+    implementation("org.springframework.security:spring-security-crypto:6.1.5")
+    // for logging with spring implementation
+    implementation("org.springframework:spring-jcl:5.3.25")
+
+    // for cli (like seeding db)
+    implementation("io.micronaut.picocli:micronaut-picocli")
+
+    // Validation
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+
+    // Security
+    implementation("io.micronaut.security:micronaut-security:4.11.5")
+
+    // jwt security
+    implementation("io.micronaut.security:micronaut-security-jwt")
+
+    // json web token
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
+    // Serialization
+    implementation("io.micronaut.serde:micronaut-serde-jackson:2.12.0")
+
+    // Annotations
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-    compileOnly("io.micronaut:micronaut-http-client")
-    runtimeOnly("ch.qos.logback:logback-classic")
-    testImplementation("io.micronaut:micronaut-http-client")
-}
+    // JPA support
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa:4.9.0")
 
+    // Lombok
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    compileOnly("org.projectlombok:lombok:1.18.30")
+
+    // HTTP client and logging
+    compileOnly("io.micronaut:micronaut-http-client:4.9.4")
+    runtimeOnly("ch.qos.logback:logback-classic:1.4.14")
+    testImplementation("io.micronaut:micronaut-http-client:4.9.4")
+}
 
 application {
     mainClass = "org.charitable.app.Application"
 }
+
 java {
     sourceCompatibility = JavaVersion.toVersion("21")
     targetCompatibility = JavaVersion.toVersion("21")
 }
 
-
 graalvmNative.toolchainDetection = false
+
 sourceSets {
     main {
         java {
@@ -74,8 +122,6 @@ micronaut {
         annotations("org.charitable.app.*")
     }
     aot {
-        // Please review carefully the optimizations enabled below
-        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
         optimizeServiceLoading = false
         convertYamlToJava = false
         precomputeOperations = true
@@ -87,9 +133,14 @@ micronaut {
     }
 }
 
-
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
     jdkVersion = "21"
 }
 
-
+tasks.register<JavaExec>("runSeeder") {
+    group = "application"
+    description = "Runs the seeder command"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "org.charitable.app.infrastructure.command.SeedCommand"
+//    args("seed-admin")
+}

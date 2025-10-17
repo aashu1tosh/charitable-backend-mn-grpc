@@ -4,5 +4,6 @@
     "src/main/java",
     "build/generated/source/proto/main/java",
     "build/generated/source/proto/main/grpc"
-  ]
+  ],
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

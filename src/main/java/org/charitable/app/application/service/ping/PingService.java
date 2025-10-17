@@ -1,12 +1,15 @@
 package org.charitable.app.application.service.ping;
 
-import java.time.Instant;
+import org.charitable.app.application.dto.response.AppResponse;
+import org.charitable.app.application.port.inbound.ping.PingUseCase;
 
-import org.charitable.app.domain.Ping;
+import jakarta.inject.Singleton;
 
-public class PingService {
+@Singleton
+class PingService implements PingUseCase {
 
-    public Ping ping() {
-        return new Ping("pong", Instant.now());
+    @Override
+    public AppResponse<String> ping() {
+         return new AppResponse<>(true, "Pong", "");
     }
 }
