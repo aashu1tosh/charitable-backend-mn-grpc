@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Type(GrpcAuthInterceptor.class)
-public @interface GrpcAuthenticated {
+public @interface GrpcAuthenticate {
     Role[] roles() default {};
 }

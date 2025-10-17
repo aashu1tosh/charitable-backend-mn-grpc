@@ -11,10 +11,8 @@ import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
-import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.context.GrpcContextKeys;
-import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticated;
-import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticatedUser;
+import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticate;
 import org.charitable.app.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +141,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
-    @GrpcAuthenticated(roles = {Role.SUDO_ADMIN})
+    @GrpcAuthenticate(roles = {Role.SUDO_ADMIN})
     public void myInfo(EmptyRequest request, StreamObserver<CommonResponse> responseObserver) {
 
         logger.info("Receive my info request");

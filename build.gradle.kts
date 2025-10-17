@@ -51,6 +51,11 @@ dependencies {
     // jwt security
     implementation("io.micronaut.security:micronaut-security-jwt")
 
+    // json web token
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
     // Serialization
     implementation("io.micronaut.serde:micronaut-serde-jackson:2.12.0")
 
