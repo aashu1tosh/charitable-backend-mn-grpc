@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class GlobalGrpcExceptionInterceptor implements ServerInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthGrpcService.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalGrpcExceptionInterceptor.class);
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(

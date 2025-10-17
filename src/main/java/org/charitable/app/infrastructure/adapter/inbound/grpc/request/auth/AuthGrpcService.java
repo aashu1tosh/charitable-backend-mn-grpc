@@ -12,6 +12,7 @@ import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
+import org.charitable.app.infrastructure.adapter.inbound.grpc.context.GrpcContextKeys;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticated;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticatedUser;
 import org.charitable.app.proto.*;
@@ -144,10 +145,13 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     @Override
     @GrpcAuthenticated(roles = {Role.SUDO_ADMIN})
     public void myInfo(EmptyRequest request, StreamObserver<CommonResponse> responseObserver) {
-        logger.info("Receive my info request");
-//        var id = UUIDUtils.stringToUUID("901016cb-2b20-4945-8089-34ed27fd856e");
-//        authUseCase.myInfo(id);
 
+        logger.info("Receive my info request");
+        var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
+
+        var resp = authUseCase.myInfo(tokenPayload.getId());
+
+        logger.info("Receive my info response: {}", resp);
         CommonResponse response = CommonResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("My info retrieved successfully")

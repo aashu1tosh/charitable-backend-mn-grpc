@@ -4,11 +4,14 @@ import io.grpc.*;
 import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.type.Argument;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
 import org.charitable.app.domain.model.Role;
+import org.charitable.app.domain.model.token.TokenPayload;
+import org.charitable.app.infrastructure.adapter.inbound.grpc.context.GrpcContextKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +26,8 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
     private static final String AUTHORIZATION_HEADER = "authorization"; // lowercase!
     private static final String BEARER_PREFIX = "Bearer ";
 
+    private static final Context.Key<TokenPayload> TOKEN_PAYLOAD_KEY =
+            Context.key("tokenPayload");
     private AuthTokenManager authTokenService;
 
     public GrpcAuthInterceptor(AuthTokenManager authTokenImpl) {
@@ -63,7 +68,13 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
                 }
             }
 
-            context.setAttribute("TokenPayload", tokenPayload);
+//            context.setAttribute("TokenPayload", tokenPayload);
+
+
+            Context grpcContext = Context.current()
+                    .withValue(GrpcContextKeys.TOKEN_PAYLOAD_KEY, tokenPayload);
+            grpcContext.run(context::proceed);
+
             return context.proceed();
         } catch (AppException e) {
             throw AppException.unauthorized(e.getMessage());

@@ -44,8 +44,8 @@ class JwtProvider implements AuthTokenManager {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("id", auth.getId());
         attributes.put("role", auth.getRole());
-        attributes.put("organization_id", auth.getOrganization() != null ? auth.getOrganization().getId() : null);
-        attributes.put("user_id", auth.getUser() != null ? auth.getUser().getId() : null);
+        attributes.put("organizationId", auth.getOrganization() != null ? auth.getOrganization().getId() : null);
+        attributes.put("userId", auth.getUser() != null ? auth.getUser().getId() : null);
 
         var roles = Collections.singletonList(auth.getRole().toString());
 
@@ -71,11 +71,12 @@ class JwtProvider implements AuthTokenManager {
             SignedJWT signedJWT = SignedJWT.parse(token);
 
             var jwtSecret = envVariables.getJwtAccessTokenSecret();
+            logger.info("Jwt Secret: {}", jwtSecret);
             JWSVerifier verifier = new MACVerifier(jwtSecret);
             boolean validSignature = signedJWT.verify(verifier);
 
             if (!validSignature) {
-                throw AppException.unauthorized("Invalid token signature");
+                throw AppException.unauthorized("Please login again.");
             }
 
             if (signedJWT.getJWTClaimsSet().getExpirationTime() != null &&
@@ -107,7 +108,7 @@ class JwtProvider implements AuthTokenManager {
         } catch (ParseException e) {
             throw AppException.unauthorized("Malformed token");
         } catch (Exception e) {
-            throw AppException.internal("Error validating token: " + e.getMessage());
+            throw AppException.internal("Error validating token. Please try again.");
         }
     }
 }

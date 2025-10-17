@@ -24,11 +24,11 @@ public class EnvVariables {
     }
 
     public String getJwtAccessTokenSecret() {
-        return getEnvOrThrow("micronaut.security.token.jwt.signatures.secret.generator.secret");
+        return getEnvOrThrow("micronaut.security.token.jwt.generator.access-token.secret");
     }
 
     public String getJwtRefreshTokenSecret() {
-        return getEnvOrThrow("micronaut.security.token.jwt.generator.refresh-token.secret");
+        return getEnvOrThrow("micronaut.security.token.jwt.generator.access-token.secret");
     }
 
     private String getEnvOrThrow(String key) {
