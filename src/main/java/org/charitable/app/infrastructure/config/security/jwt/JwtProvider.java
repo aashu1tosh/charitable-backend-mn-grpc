@@ -3,9 +3,6 @@ package org.charitable.app.infrastructure.config.security.jwt;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.SignedJWT;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import io.micronaut.context.annotation.Bean;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
 import io.micronaut.security.token.jwt.validator.JwtAuthenticationFactory;
@@ -23,12 +20,7 @@ import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.infrastructure.config.environment.EnvVariables;
 
 import java.text.ParseException;
-import java.time.Instant;
 import java.util.*;
-import io.jsonwebtoken.Jwts;
-
-import javax.crypto.SecretKey;
-
 
 @Singleton
 @AllArgsConstructor
@@ -46,65 +38,30 @@ class JwtProvider implements AuthTokenManager {
 
     private final EnvVariables envVariables;
 
-    @Bean
-    public SecretKey accessTokenKey() {
-        String secret = envVariables.getJwtAccessTokenSecret();
-        if (secret == null || secret.isBlank()) {
-            throw new IllegalStateException("JWT_ACCESS_SECRET environment variable not set");
-        }
-        return Keys.hmacShaKeyFor(secret.getBytes());
-    }
-
-    @Bean
-    public SecretKey refreshTokenKey() {
-        String secret = envVariables.getJwtRefreshTokenSecret();
-        if (secret == null || secret.isBlank()) {
-            throw new IllegalStateException("JWT_REFRESH_SECRET environment variable not set");
-        }
-        return Keys.hmacShaKeyFor(secret.getBytes());
-    }
-
     @Override
     public IdentityTokens generateToken(Auth auth) {
+
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("id", auth.getId());
         attributes.put("role", auth.getRole());
-        attributes.put("organizationId", auth.getOrganization() != null ? auth.getOrganization().getId() : null);
-        attributes.put("userId", auth.getUser() != null ? auth.getUser().getId() : null);
+        attributes.put("organization_id", auth.getOrganization() != null ? auth.getOrganization().getId() : null);
+        attributes.put("user_id", auth.getUser() != null ? auth.getUser().getId() : null);
 
-        String accessToken = generateAccessToken(auth.getId().toString(), auth.getRole().toString(), attributes);
-        String refreshToken = generateRefreshToken(auth.getId().toString(), auth.getRole().toString(), attributes);
+        var roles = Collections.singletonList(auth.getRole().toString());
 
-        return new IdentityTokens(accessToken, refreshToken);
+        Authentication authentication = Authentication.build(auth.getId().toString(), roles, attributes);
+        // expiration will be injected from configuration
+        Optional<String> accessToken = accessTokenGenerator.generateToken(authentication, null);
+
+        Optional<String> refreshToken = refreshTokenGenerator.generateToken(authentication, null);
+
+        return new IdentityTokens(
+                accessToken.orElseThrow(() -> new RuntimeException("Failed to generate access token")),
+                refreshToken.orElseThrow(() -> new RuntimeException("Failed to generate refresh token"))
+        );
     }
 
-    private String generateAccessToken(String userId, String role, Map<String, Object> attributes) {
-        Instant now = Instant.now();
-        Instant expirationTime = now.plusSeconds(3600); // 1 hour
 
-        return Jwts.builder()
-                .subject(userId)
-                .claim("role", role)
-                .claims(attributes)
-                .issuedAt(java.util.Date.from(now))
-                .expiration(java.util.Date.from(expirationTime))
-                .signWith(accessTokenKey())
-                .compact();
-    }
-
-    private String generateRefreshToken(String userId, String role, Map<String, Object> attributes) {
-        Instant now = Instant.now();
-        Instant expirationTime = now.plusSeconds(2592000); // 30 days
-
-        return Jwts.builder()
-                .subject(userId)
-                .claim("role", role)
-                .claims(attributes)
-                .issuedAt(java.util.Date.from(now))
-                .expiration(java.util.Date.from(expirationTime))
-                .signWith(refreshTokenKey())
-                .compact();
-    }
     @Override
     public TokenPayload validateAccessToken(String token) {
         try {
@@ -114,13 +71,11 @@ class JwtProvider implements AuthTokenManager {
             SignedJWT signedJWT = SignedJWT.parse(token);
 
             var jwtSecret = envVariables.getJwtAccessTokenSecret();
-            logger.info("Jwt Secret: {}", jwtSecret);
             JWSVerifier verifier = new MACVerifier(jwtSecret);
             boolean validSignature = signedJWT.verify(verifier);
 
-            logger.info("JWT Signature verified: {}", validSignature);
             if (!validSignature) {
-                throw AppException.unauthorized("Please login again.");
+                throw AppException.unauthorized("Invalid token signature");
             }
 
             if (signedJWT.getJWTClaimsSet().getExpirationTime() != null &&
@@ -152,7 +107,7 @@ class JwtProvider implements AuthTokenManager {
         } catch (ParseException e) {
             throw AppException.unauthorized("Malformed token");
         } catch (Exception e) {
-            throw AppException.internal("Error validating token. Please try again.");
+            throw AppException.internal("Error validating token: " + e.getMessage());
         }
     }
 }

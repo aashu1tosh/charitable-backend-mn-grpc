@@ -37,11 +37,11 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
     @Override
     public Object intercept(MethodInvocationContext<Object, Object> context) {
         // Access annotation
-        AnnotationValue<GrpcAuthenticated> annotation =
-                context.findAnnotation(GrpcAuthenticated.class)
+        AnnotationValue<GrpcAuthenticate> annotation =
+                context.findAnnotation(GrpcAuthenticate.class)
                         .orElseThrow(() -> new IllegalStateException("Authentication annotation not present"));
 
-        log.debug("Processing GrpcAuthenticated annotation");
+        log.debug("Processing GrpcAuthenticate annotation");
 
         // Extract token from gRPC metadata
         String token = extractTokenFromMetadata();
@@ -68,18 +68,14 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
                 }
             }
 
-//            context.setAttribute("TokenPayload", tokenPayload);
+            return Context.current()
+                    .withValue(GrpcContextKeys.TOKEN_PAYLOAD_KEY, tokenPayload)
+                    .call(context::proceed);
 
-
-            Context grpcContext = Context.current()
-                    .withValue(GrpcContextKeys.TOKEN_PAYLOAD_KEY, tokenPayload);
-            grpcContext.run(context::proceed);
-
-            return context.proceed();
         } catch (AppException e) {
             throw AppException.unauthorized(e.getMessage());
         } catch (Exception ex) {
-            log.error("Exception while processing GrpcAuthenticated annotation", ex);
+            log.error("Exception while processing GrpcAuthenticate annotation", ex);
             throw AppException.unauthorized("Authentication failed");
         } finally {
             log.debug("Completed method execution");
