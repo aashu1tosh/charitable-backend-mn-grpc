@@ -1,7 +1,12 @@
 package org.charitable.app.infrastructure.config.security.jwt;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
@@ -18,6 +23,7 @@ import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.infrastructure.config.environment.EnvVariables;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.*;
@@ -26,13 +32,7 @@ import java.util.*;
 @AllArgsConstructor
 class JwtProvider implements AuthTokenManager {
 
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(JwtProvider.class);
-
-    @Named("access")
-    private final JwtTokenGenerator accessTokenGenerator;
-
-    @Named("refresh")
-    private final JwtTokenGenerator refreshTokenGenerator;
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
     private final JwtAuthenticationFactory jwtAuthenticationFactory;
 
@@ -40,26 +40,52 @@ class JwtProvider implements AuthTokenManager {
 
     @Override
     public IdentityTokens generateToken(Auth auth) {
-
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("id", auth.getId());
-        attributes.put("role", auth.getRole());
-        attributes.put("organization_id", auth.getOrganization() != null ? auth.getOrganization().getId() : null);
-        attributes.put("user_id", auth.getUser() != null ? auth.getUser().getId() : null);
-
-        var roles = Collections.singletonList(auth.getRole().toString());
-
-        Authentication authentication = Authentication.build(auth.getId().toString(), roles, attributes);
-        // expiration will be injected from configuration
-        Optional<String> accessToken = accessTokenGenerator.generateToken(authentication, null);
-
-        Optional<String> refreshToken = refreshTokenGenerator.generateToken(authentication, null);
-
-        return new IdentityTokens(
-                accessToken.orElseThrow(() -> new RuntimeException("Failed to generate access token")),
-                refreshToken.orElseThrow(() -> new RuntimeException("Failed to generate refresh token"))
-        );
+        try {
+            var accessToken = createAccessToken(auth);
+            var refreshToken = createRefreshToken(auth);
+            return new IdentityTokens(accessToken, refreshToken);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate token", e);
+        }
     }
+
+    private String createAccessToken(Auth auth) throws JOSEException {
+        var secret = envVariables.getJwtAccessTokenSecret();
+        var expiration = envVariables.getJwtAccessTokenExpiration();
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + expiration);
+
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .subject(auth.getId().toString())
+                .issuer("charitable-backend")
+                .issueTime(now)
+                .expirationTime(exp)
+                .claim("id", auth.getId().toString())
+                .claim("role", auth.getRole().toString())
+                .claim("organization_id", auth.getOrganization() != null ? auth.getOrganization().getId().toString() : null)
+                .claim("user_id", auth.getUser() != null ? auth.getUser().getId().toString() : null)
+                .build();
+
+        return signToken(claims, secret);
+    }
+
+    private String createRefreshToken(Auth auth) throws JOSEException {
+        var secret = envVariables.getJwtRefreshTokenSecret();
+        var expiration = envVariables.getJwtRefreshTokenExpiration();
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + expiration);
+
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .subject(auth.getId().toString())
+                .issuer("charitable-backend")
+                .issueTime(now)
+                .expirationTime(exp)
+                .claim("role", auth.getRole().toString())
+                .build();
+
+        return signToken(claims, secret);
+    }
+
 
 
     @Override
@@ -109,5 +135,15 @@ class JwtProvider implements AuthTokenManager {
         } catch (Exception e) {
             throw AppException.internal("Error validating token: " + e.getMessage());
         }
+    }
+
+
+    private String signToken(JWTClaimsSet claims, String secret) throws JOSEException {
+        SignedJWT signedJWT = new SignedJWT(
+                new JWSHeader(JWSAlgorithm.HS256),
+                claims
+        );
+        signedJWT.sign(new MACSigner(secret));
+        return signedJWT.serialize();
     }
 }
