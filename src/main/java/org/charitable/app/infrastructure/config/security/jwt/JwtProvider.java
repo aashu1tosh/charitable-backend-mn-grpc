@@ -106,7 +106,7 @@ class JwtProvider implements AuthTokenManager {
 
             if (signedJWT.getJWTClaimsSet().getExpirationTime() != null &&
                     signedJWT.getJWTClaimsSet().getExpirationTime().before(new java.util.Date())) {
-                throw AppException.unauthorized("Token has expired");
+                throw AppException.unauthorized("TOKEN_EXPIRED");
             }
 
             Optional<Authentication> authentication = jwtAuthenticationFactory.createAuthentication(signedJWT);

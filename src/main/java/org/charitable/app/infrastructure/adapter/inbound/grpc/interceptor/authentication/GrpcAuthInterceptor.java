@@ -73,10 +73,10 @@ public class GrpcAuthInterceptor implements MethodInterceptor<Object, Object> {
                     .call(context::proceed);
 
         } catch (AppException e) {
-            throw AppException.unauthorized(e.getMessage());
+            throw e;
         } catch (Exception ex) {
             log.error("Exception while processing GrpcAuthenticate annotation", ex);
-            throw AppException.unauthorized("Authentication failed");
+            throw AppException.internal("Something went wrong. Please try again later.");
         } finally {
             log.debug("Completed method execution");
         }

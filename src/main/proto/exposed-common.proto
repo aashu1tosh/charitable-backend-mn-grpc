@@ -10,3 +10,28 @@ message CommonResponse {
   bool success = 1;
   string message = 2;
 }
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  SUDO_ADMIN = 1;
+  ADMIN = 2;
+  USER = 3;
+  ORGANIZATION = 4;
+}
+
+enum AuthStatus {
+  STATUS_UNSPECIFIED = 0;
+  ACTIVE = 1;
+  INACTIVE = 2;
+  SUSPENDED = 3;
+  DELETED = 4;
+}
+
+message Organization {
+  string name = 1;
+  string address = 2;
+  float latitude = 3;
+  float longitude = 4;
+  string govtId = 5;
+  string contactNumber = 6;
+}

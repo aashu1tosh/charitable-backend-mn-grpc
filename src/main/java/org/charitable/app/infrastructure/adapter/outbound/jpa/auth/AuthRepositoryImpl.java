@@ -1,6 +1,7 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
 import jakarta.inject.Singleton;
+import org.charitable.app.application.exception.AppException;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
@@ -35,8 +36,22 @@ class AuthRepositoryImpl implements AuthRepository {
 
     @Override
     public Optional<Auth> findById(UUID id) {
-        return jpaRepository.findById(id)
-                .map(AuthRepositoryImpl::mapToDomain);
+         var auth = jpaRepository.findById(id);
+
+         if(auth.isEmpty()) {
+             throw AppException.badRequest("Requested data not found");
+         }
+         var entity = auth.get();
+
+         return Optional.ofNullable(Auth.builder()
+                 .id(entity.getId())
+                 .email(entity.getEmail())
+                 .phone(entity.getPhoneNumber())
+                 .status(entity.getStatus())
+                 .role(entity.getRole())
+                 .organization(null)
+                 .user(null)
+                 .build());
     }
 
     @Override

@@ -135,17 +135,53 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 
     @Override
     @GrpcAuthenticate(roles = {Role.SUDO_ADMIN})
-    public void myInfo(EmptyRequest request, StreamObserver<CommonResponse> responseObserver) {
+    public void myInfo(EmptyRequest request, StreamObserver<MyInfoResponse> responseObserver) {
 
         logger.info("Receive my info request");
         var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
 
         var resp = authUseCase.myInfo(tokenPayload.getId());
 
+        logger.info("My info log {}", resp.getData());
         logger.info("Receive my info response: {}", resp);
-        CommonResponse response = CommonResponse.newBuilder()
+
+        Organization orgData = null;
+        if (resp.getData().getOrganization() != null && resp.getData().getOrganization().getId() != null) {
+            var org = resp.getData().getOrganization();
+            orgData = Organization.newBuilder()
+                    .setName(org.getName())
+                    .setAddress(org.getAddress())
+                    .setLatitude(org.getLatitude())
+                    .setLongitude(org.getLongitude())
+                    .setGovtId(org.getGovtId())
+                    .setContactNumber(org.getContactNumber())
+                    .build();
+        }
+
+        MyInfoData.Builder infoBuilder = MyInfoData.newBuilder()
+                .setEmail(resp.getData().getEmail())
+                .setPhone(resp.getData().getPhone())
+                .setRole(
+                        resp.getData().getRole() != null
+                                ? org.charitable.app.proto.Role.valueOf(resp.getData().getRole().name())
+                                : org.charitable.app.proto.Role.ROLE_UNSPECIFIED
+                )
+                .setStatus(
+                        resp.getData().getStatus() != null
+                                ? org.charitable.app.proto.AuthStatus.valueOf(resp.getData().getStatus().name())
+                                : org.charitable.app.proto.AuthStatus.STATUS_UNSPECIFIED
+                );
+
+        if (orgData != null) {
+            infoBuilder.setOrganization(orgData);
+        }
+
+        MyInfoData infoData = infoBuilder.build();
+
+        MyInfoResponse response = MyInfoResponse.newBuilder()
                 .setSuccess(true)
-                .setMessage("My info retrieved successfully")
+                .setMessage(resp.getMessage())
+                .setData(infoData)
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

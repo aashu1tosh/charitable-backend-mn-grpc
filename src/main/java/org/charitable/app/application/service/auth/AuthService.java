@@ -126,7 +126,6 @@ class AuthService implements AuthUseCase {
         var auth = authRepository.findById(authId)
                 .orElseThrow(() -> AppException.notFound("Auth not found"));
 
-        logger.info("My Information auth: {}", auth.getEmail());
         return new AppResponse<Auth>(true, "Information fetched Successfully", auth);
     }
 }

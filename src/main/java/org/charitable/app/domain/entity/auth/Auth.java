@@ -1,8 +1,10 @@
 package org.charitable.app.domain.entity.auth;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.charitable.app.domain.entity.base.Base;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.entity.user.User;
@@ -12,6 +14,7 @@ import org.charitable.app.domain.model.auth.AuthStatus;
 @Getter
 @Setter
 @AllArgsConstructor
+@SuperBuilder
 public class Auth extends Base {
     private String email;
     private String password;
