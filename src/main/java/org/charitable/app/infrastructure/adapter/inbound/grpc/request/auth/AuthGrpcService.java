@@ -9,6 +9,7 @@ import org.charitable.app.application.dto.request.organization.OrganizationRegis
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.common.utils.ValidationUtils;
+import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.context.GrpcContextKeys;
@@ -31,8 +32,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
-    public void login(LoginRequest request, StreamObserver<CommonResponse> responseObserver) {
-        try {
+    public void login(LoginRequest request, StreamObserver<LoginResponse> responseObserver) {
             logger.info("Received login request for user: {}", request.getUsername());
             String username = request.getUsername();
             String password = request.getPassword();
@@ -42,24 +42,17 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
             validator.validate(dto);
 
             var result = authUseCase.login(dto);
+            IdentityTokens tokens = (IdentityTokens) result.getData();
 
-            var response = CommonResponse.newBuilder()
+            var responseToken = AuthTokenResponse.newBuilder().setAccessToken(tokens.getAccessToken()).setRefreshToken(tokens.getRefreshToken()).build();
+            var response = LoginResponse.newBuilder()
                     .setSuccess(result.isSuccess())
-                    .setMessage(result.getMessage())
-                    .build();
+                            .setMessage(result.getMessage())
+                            .setData(responseToken).build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (Exception e) {
-            var response = CommonResponse.newBuilder()
-                    .setSuccess(false)
-                    .setMessage("An error occurred during login")
-                    .build();
 
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-            logger.error("Logging failed", e);
-        }
 }
 
     @Override
