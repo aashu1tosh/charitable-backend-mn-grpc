@@ -134,7 +134,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
-    @GrpcAuthenticate(roles = {Role.SUDO_ADMIN})
+    @GrpcAuthenticate()
     public void myInfo(EmptyRequest request, StreamObserver<MyInfoResponse> responseObserver) {
 
         logger.info("Receive my info request");
