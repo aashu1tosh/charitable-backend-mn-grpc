@@ -158,6 +158,19 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
                     .build();
         }
 
+        org.charitable.app.proto.User user = null;
+        if (resp.getData().getUser() != null && resp.getData().getUser().getId() != null) {
+            logger.info("Receive my info user {}", resp.getData().getUser().getId());
+            var usr = resp.getData().getUser();
+            user = User.newBuilder()
+                    .setFirstName(usr.getFirstName())
+                    .setMiddleName(usr.getMiddleName())
+                    .setLastName(usr.getLastName())
+                    .setLatitude(usr.getLatitude())
+                    .setLongitude(usr.getLongitude())
+                    .build();
+        }
+
         MyInfoData.Builder infoBuilder = MyInfoData.newBuilder()
                 .setEmail(resp.getData().getEmail())
                 .setPhone(resp.getData().getPhone())
@@ -174,6 +187,10 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 
         if (orgData != null) {
             infoBuilder.setOrganization(orgData);
+        }
+
+        if(user != null) {
+            infoBuilder.setUser(user);
         }
 
         MyInfoData infoData = infoBuilder.build();

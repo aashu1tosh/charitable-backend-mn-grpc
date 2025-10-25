@@ -35,3 +35,11 @@ message Organization {
   string govtId = 5;
   string contactNumber = 6;
 }
+
+message User {
+  string firstName = 1;
+  string middleName = 2;
+  string lastName = 3;
+  float  latitude = 4;
+  float longitude = 5;
+}

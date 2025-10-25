@@ -1,9 +1,11 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
+import io.micronaut.http.server.exceptions.BufferLengthExceededHandler;
 import jakarta.inject.Singleton;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.organization.Organization;
+import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
@@ -21,7 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     private final AuthJpaRepository jpaRepository;
 
-    public AuthRepositoryImpl(AuthJpaRepository  jpaRepository) {
+    AuthRepositoryImpl(AuthJpaRepository jpaRepository) {
         this.jpaRepository = jpaRepository;
     }
 
@@ -35,23 +37,69 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
-    public Optional<Auth> findById(UUID id) {
-         var auth = jpaRepository.findById(id);
+    public Auth findMyInfo(UUID id) {
+         var auth = jpaRepository.findByIdWithRelations(id);
 
          if(auth.isEmpty()) {
              throw AppException.badRequest("Requested data not found");
          }
          var entity = auth.get();
 
-         return Optional.ofNullable(Auth.builder()
+         Organization orgEntity = null;
+         if (entity.getOrganization() != null) {
+             orgEntity = Organization.builder()
+                     .id(entity.getOrganization().getId())
+                     .name(entity.getOrganization().getName())
+                     .address(entity.getOrganization().getAddress())
+                     .latitude(entity.getOrganization().getLatitude())
+                     .longitude(entity.getOrganization().getLongitude())
+                     .govtId(entity.getOrganization().getGovtId())
+                     .contactNumber(entity.getOrganization().getContactNumber())
+                     .build();
+         }
+
+        User userEntity = null;
+         if(entity.getUser() != null) {
+             var user = entity.getUser();
+             userEntity = User.builder()
+                     .id(user.getId())
+                     .firstName(user.getFirstName())
+                     .middleName(user.getMiddleName())
+                     .lastName(user.getLastName())
+                     .latitude(user.getLatitude())
+                     .longitude(user.getLongitude())
+                     .build();
+         }
+
+         return Auth.builder()
                  .id(entity.getId())
                  .email(entity.getEmail())
                  .phone(entity.getPhoneNumber())
                  .status(entity.getStatus())
                  .role(entity.getRole())
-                 .organization(null)
-                 .user(null)
-                 .build());
+                 .organization(orgEntity)
+                 .user(userEntity)
+                 .build();
+    }
+
+    @Override
+    public Auth findById(UUID id) {
+        var auth = jpaRepository.findById(id);
+
+        if(auth.isEmpty()) {
+            throw AppException.badRequest("Requested data not found");
+        }
+        var entity = auth.get();
+
+        return Auth.builder()
+                .id(entity.getId())
+                .email(entity.getEmail())
+                .phone(entity.getPhoneNumber())
+                .status(entity.getStatus())
+                .role(entity.getRole())
+                .organization(null)
+                .user(null)
+                .build();
     }
 
     @Override

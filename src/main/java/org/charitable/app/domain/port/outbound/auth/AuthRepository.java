@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface AuthRepository {
     Optional<Auth> findByEmail(String email);
-    Optional<Auth> findById(UUID id);
+    Auth findById(UUID id);
+    Auth findMyInfo(UUID id);
     Auth save(Auth auth);
 }

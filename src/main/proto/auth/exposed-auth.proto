@@ -66,6 +66,7 @@ message MyInfoData {
   Role role = 3;
   AuthStatus status = 4;
   Organization organization = 5;
+  User user = 6;
 }
 
 message MyInfoResponse {
