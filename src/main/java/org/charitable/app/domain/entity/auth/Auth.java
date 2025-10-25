@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.charitable.app.domain.admin.entity.Admin;
 import org.charitable.app.domain.entity.base.Base;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.entity.user.User;
@@ -24,4 +25,5 @@ public class Auth extends Base {
     private AuthStatus status;
     private Organization organization;
     private User user;
+    private Admin admin;
 }

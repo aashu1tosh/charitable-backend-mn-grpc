@@ -1,13 +1,12 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
-import io.micronaut.http.server.exceptions.BufferLengthExceededHandler;
 import jakarta.inject.Singleton;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
-import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
+import org.charitable.app.infrastructure.mapper.admin.AdminMapper;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 import org.charitable.app.infrastructure.mapper.user.UserMapper;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @Singleton
 class AuthRepositoryImpl implements AuthRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthGrpcService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthRepositoryImpl.class);
 
     private final AuthJpaRepository jpaRepository;
 
@@ -104,16 +103,30 @@ class AuthRepositoryImpl implements AuthRepository {
 
     @Override
     public Auth save(Auth auth) {
-        var entity = new AuthEntity(
-                auth.getEmail(),
-                auth.getPassword(),
-                auth.getPhone(),
-                auth.getRole(),
-                auth.getIsEmailVerified(),
-                auth.getStatus(),
-                OrganizationMapper.mapToEntitySafe(auth.getOrganization()),
-                UserMapper.mapToSafeEntity(auth.getUser())
-        );
+//        var entity = new AuthEntity(
+//                auth.getEmail(),
+//                auth.getPassword(),
+//                auth.getPhone(),
+//                auth.getRole(),
+//                auth.getIsEmailVerified(),
+//                auth.getStatus(),
+//                OrganizationMapper.mapToEntitySafe(auth.getOrganization()),
+//                UserMapper.mapToSafeEntity(auth.getUser())
+//        );
+
+        var entity = AuthEntity.builder()
+                .email(auth.getEmail())
+                .password(auth.getPassword())
+                .phoneNumber(auth.getPhone())
+                .role(auth.getRole())
+                .status(auth.getStatus())
+                .isEmailVerified(auth.getIsEmailVerified())
+                .status(auth.getStatus())
+                .organization(OrganizationMapper.mapToEntitySafe(auth.getOrganization()))
+                .user(UserMapper.mapToSafeEntity(auth.getUser()))
+                .admin(AdminMapper.mapToSafeEntity(auth.getAdmin()))
+                .build();
+
         var savedEntity = jpaRepository.save(entity);
         logger.info("Saved user: {}", savedEntity);
         return mapToDomain(savedEntity);
@@ -127,6 +140,7 @@ class AuthRepositoryImpl implements AuthRepository {
                 entity.getRole(),
                 entity.getIsEmailVerified(),
                 entity.getStatus(),
+                null,
                 null,
                 null
         );

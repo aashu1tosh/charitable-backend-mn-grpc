@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.admin.AdminEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
@@ -56,4 +57,8 @@ public class AuthEntity extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "user_id", nullable = true)
     private UserEntity user;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "admin_id", nullable = true)
+    private AdminEntity admin;
 }

@@ -3,6 +3,7 @@ package org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth;
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
+import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
@@ -92,7 +93,6 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         responseObserver.onCompleted();
     }
 
-
     @Override
     public void registerOrganization(RegisterOrganizationRequest request, StreamObserver<CommonResponse> responseObserver) {
         logger.info("Received register organization request for organization: {}", request.getOrganizationName());
@@ -128,6 +128,46 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         CommonResponse response = CommonResponse.newBuilder()
                 .setSuccess(resp.isSuccess())
                 .setMessage(resp.getMessage())
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @GrpcAuthenticate(roles = {Role.SUDO_ADMIN})
+    public void registerAdmin(RegisterAdminRequest request, StreamObserver<CommonResponse> responseObserver) {
+        logger.info("Admin register request received.");
+        String password = request.getPassword();
+        String email = request.getEmail();
+        String phone = request.getPhoneNumber();
+
+        String firstName = request.getFirstName();
+        String middleName = request.getMiddleName();
+        String lastName = request.getLastName();
+
+        var auth = AuthRegisterRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .phone(phone)
+                .role(Role.ADMIN)
+                .status(AuthStatus.ACTIVE)
+                .build();
+
+        validator.validate(auth);
+
+        var admin = AdminRegisterRequestDTO.builder()
+                .firstName(firstName)
+                .middleName(middleName)
+                .lastName(lastName)
+                .build();
+
+        validator.validate(admin);
+
+        var rsp = authUseCase.registerAdmin(auth, admin);
+
+        CommonResponse response = CommonResponse.newBuilder()
+                .setSuccess(rsp.isSuccess())
+                .setMessage(rsp.getMessage())
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

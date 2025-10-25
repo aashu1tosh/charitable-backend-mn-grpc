@@ -10,9 +10,20 @@ service AuthService {
   rpc Login (LoginRequest) returns (LoginResponse);
   rpc RegisterUser (RegisterUserRequest) returns (CommonResponse);
   rpc RegisterOrganization (RegisterOrganizationRequest) returns (CommonResponse);
+  rpc RegisterAdmin(RegisterAdminRequest) returns (CommonResponse);
 
   rpc MyInfo(EmptyRequest) returns (MyInfoResponse);
   rpc Logout (LogoutRequest) returns (CommonResponse);
+}
+
+message RegisterAdminRequest {
+  string email = 1;
+  string password = 2;
+  string phone_number = 3;
+
+  string firstName = 4;
+  string middleName = 5;
+  string lastName = 6;
 }
 
 message LoginRequest {

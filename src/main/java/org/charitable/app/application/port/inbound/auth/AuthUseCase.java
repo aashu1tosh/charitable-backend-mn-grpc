@@ -1,5 +1,6 @@
 package org.charitable.app.application.port.inbound.auth;
 
+import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
@@ -13,5 +14,6 @@ public interface AuthUseCase {
     AppResponse<?> login(LoginRequestDTO loginRequestDTO);
     AppResponse<String> registerOrganization(AuthRegisterRequestDTO authRegisterRequestDTO, OrganizationRegisterRequestDTO organizationRegisterRequestDTO );
     AppResponse<String> registerUser(AuthRegisterRequestDTO authRegisterRequestDTO, UserRegisterRequestDTO userRegisterRequestDTO);
+    AppResponse<String> registerAdmin(AuthRegisterRequestDTO authRegisterRequestDTO, AdminRegisterRequestDTO adminRegisterRequestDTO);
     AppResponse<Auth> myInfo(UUID authId);
 }

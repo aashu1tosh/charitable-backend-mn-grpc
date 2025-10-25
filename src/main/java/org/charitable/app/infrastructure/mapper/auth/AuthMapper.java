@@ -2,6 +2,7 @@ package org.charitable.app.infrastructure.mapper.auth;
 
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
+import org.charitable.app.infrastructure.mapper.admin.AdminMapper;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 import org.charitable.app.infrastructure.mapper.user.UserMapper;
 
@@ -28,6 +29,7 @@ public class AuthMapper {
                 auth.getIsEmailVerified(),
                 auth.getStatus(),
                 OrganizationMapper.mapToEntitySafe(auth.getOrganization()),
+                null,
                 null
         );
         entity.setId(auth.getId());
@@ -46,7 +48,8 @@ public class AuthMapper {
                 authEntity.getIsEmailVerified(),
                 authEntity.getStatus(),
                 OrganizationMapper.mapToDomain(authEntity.getOrganization()),
-                UserMapper.mapToDomain(authEntity.getUser())
+                UserMapper.mapToDomain(authEntity.getUser()),
+                AdminMapper.mapToDomain(authEntity.getAdmin())
         );
         auth.setId(authEntity.getId());
         auth.setCreatedAt(authEntity.getCreatedAt());
