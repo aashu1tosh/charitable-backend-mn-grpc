@@ -176,7 +176,7 @@ class AuthService implements AuthUseCase {
             throw AppException.badRequest("You are not authorized for this process");
         }
 
-        authRepository.
+        authRepository.updateAuthStatus(data.getId(), data.getAuthStatus());
         return new AppResponse<String>(true, "Update Successful", "");
     }
 
