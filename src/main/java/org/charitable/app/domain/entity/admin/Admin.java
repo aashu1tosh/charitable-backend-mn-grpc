@@ -1,4 +1,4 @@
-package org.charitable.app.domain.admin.entity;
+package org.charitable.app.domain.entity.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

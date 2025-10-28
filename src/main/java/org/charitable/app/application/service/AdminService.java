@@ -3,7 +3,7 @@ package org.charitable.app.application.service;
 import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.admin.AdminUseCase;
-import org.charitable.app.domain.admin.entity.Admin;
+import org.charitable.app.domain.entity.admin.Admin;
 import org.charitable.app.domain.port.outbound.admin.AdminRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

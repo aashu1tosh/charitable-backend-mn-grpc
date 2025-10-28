@@ -1,11 +1,10 @@
 package org.charitable.app.domain.entity.auth;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.charitable.app.domain.admin.entity.Admin;
+import org.charitable.app.domain.entity.admin.Admin;
 import org.charitable.app.domain.entity.base.Base;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.entity.user.User;

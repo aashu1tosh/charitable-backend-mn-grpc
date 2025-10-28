@@ -66,7 +66,7 @@ class AuthService implements AuthUseCase {
     }
 
     @Transactional
-    public AppResponse<String> registerOrganization(AuthRegisterRequestDTO data, OrganizationRegisterRequestDTO organization) {
+    public AppResponse<String> registerOrganization(AuthRegisterRequestDTO data, OrganizationRegisterRequestDTO organization, AdminRegisterRequestDTO admin) {
         logger.info("Service register organization for user: {}", data.getEmail());
 
         var existingAuth = authRepository.findByEmail(data.getEmail());
@@ -75,6 +75,7 @@ class AuthService implements AuthUseCase {
         }
 
         var savedOrg = organizationService.register(organization);
+        var savedAdmin = adminService.register(admin);
 
         String hashedPassword = passwordHash.hash(data.getPassword());
 
@@ -98,6 +99,7 @@ class AuthService implements AuthUseCase {
                 .isEmailVerified(false)
                 .status(data.getStatus())
                 .organization(savedOrg)
+                .admin(savedAdmin)
                 .build();
 
         var newAuth = authRepository.save(auth);

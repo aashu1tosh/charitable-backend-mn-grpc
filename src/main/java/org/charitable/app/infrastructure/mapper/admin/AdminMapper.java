@@ -1,6 +1,6 @@
 package org.charitable.app.infrastructure.mapper.admin;
 
-import org.charitable.app.domain.admin.entity.Admin;
+import org.charitable.app.domain.entity.admin.Admin;
 import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.admin.AdminEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;

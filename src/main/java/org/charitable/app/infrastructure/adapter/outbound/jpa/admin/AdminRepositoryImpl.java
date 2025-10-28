@@ -1,7 +1,7 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.admin;
 
 import jakarta.inject.Singleton;
-import org.charitable.app.domain.admin.entity.Admin;
+import org.charitable.app.domain.entity.admin.Admin;
 import org.charitable.app.domain.port.outbound.admin.AdminRepository;
 import org.charitable.app.infrastructure.mapper.admin.AdminMapper;
 import org.slf4j.Logger;

@@ -61,6 +61,12 @@ message RegisterOrganizationRequest {
   string phone_number = 2;
 
   string organization_name = 1;
+
+  string organizationHeadFirstName = 10;
+  string organizationHeadMiddleName = 11;
+  string organizationHeadLastName = 12;
+  string organizationHeadPhoneNumber = 13;
+
   string address = 5;
   float latitude = 6;
   float longitude = 7;

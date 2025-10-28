@@ -3,11 +3,13 @@ package org.charitable.app.application.dto.request.organization;
 import io.micronaut.core.annotation.Introspected;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @Introspected
 public class OrganizationRegisterRequestDTO {

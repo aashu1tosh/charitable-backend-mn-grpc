@@ -105,25 +105,34 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         float latitude = request.getLatitude();
         float longitude = request.getLongitude();
 
-        var auth = new AuthRegisterRequestDTO(
-                email,
-                password,
-                contactNumber,
-                Role.ORGANIZATION,
-                AuthStatus.ACTIVE
-        );
+        var auth = AuthRegisterRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .phone(request.getOrganizationHeadPhoneNumber())
+                .role(Role.ORGANIZATION_SUPER_ADMIN)
+                .status(AuthStatus.ACTIVE)
+                .build();
+
         validator.validate(auth);
 
-        var org = new OrganizationRegisterRequestDTO(
-                organizationName,
-                address,
-                latitude,
-                longitude,
-                govtId,
-                contactNumber
-        );
+        var org = OrganizationRegisterRequestDTO.builder()
+                .name(organizationName)
+                .address(address)
+                .latitude(latitude)
+                .longitude(longitude)
+                .govtId(govtId)
+                .contactNumber(contactNumber)
+                .build();
 
-        var resp = authUseCase.registerOrganization(auth, org);
+        var admin =  AdminRegisterRequestDTO.builder()
+                .firstName(request.getOrganizationHeadFirstName())
+                .middleName(request.getOrganizationHeadMiddleName())
+                .lastName(request.getOrganizationHeadLastName())
+                .build();
+
+        validator.validate(admin);
+
+        var resp = authUseCase.registerOrganization(auth, org, admin);
 
         CommonResponse response = CommonResponse.newBuilder()
                 .setSuccess(resp.isSuccess())

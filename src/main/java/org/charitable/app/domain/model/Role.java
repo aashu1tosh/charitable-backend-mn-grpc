@@ -4,5 +4,6 @@ public enum Role {
     SUDO_ADMIN,
     ADMIN,
     USER,
-    ORGANIZATION
+    ORGANIZATION_SUPER_ADMIN,
+    ORGANIZATION_ADMIN,
 }

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface AuthUseCase {
     AppResponse<?> login(LoginRequestDTO loginRequestDTO);
-    AppResponse<String> registerOrganization(AuthRegisterRequestDTO authRegisterRequestDTO, OrganizationRegisterRequestDTO organizationRegisterRequestDTO );
+    AppResponse<String> registerOrganization(AuthRegisterRequestDTO authRegisterRequestDTO, OrganizationRegisterRequestDTO organizationRegisterRequestDTO, AdminRegisterRequestDTO admin);
     AppResponse<String> registerUser(AuthRegisterRequestDTO authRegisterRequestDTO, UserRegisterRequestDTO userRegisterRequestDTO);
     AppResponse<String> registerAdmin(AuthRegisterRequestDTO authRegisterRequestDTO, AdminRegisterRequestDTO adminRegisterRequestDTO);
     AppResponse<Auth> myInfo(UUID authId);
