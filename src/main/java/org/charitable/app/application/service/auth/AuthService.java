@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
+import org.charitable.app.application.dto.request.auth.UpdateAuthStatusDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.dto.response.AppResponse;
@@ -16,6 +17,8 @@ import org.charitable.app.application.port.inbound.user.UserUseCase;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
+import org.charitable.app.domain.model.Role;
+import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.slf4j.Logger;
@@ -158,6 +161,23 @@ class AuthService implements AuthUseCase {
         logger.info("Registered new user with ID: {}", newAuth.getId());
 
         return new AppResponse<String>(true, "Registration successful", "dummy-token-for-" + newAuth.getId());
+    }
+
+    public AppResponse<String> updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user) {
+        var auth = authRepository.findById(data.getId());
+
+        var prjRole = auth.getRole();
+
+        if(Role.SUDO_ADMIN.equals(prjRole)) {
+            throw AppException.badRequest("You are not authorized for this process");
+        }
+
+        if(user.getRole().equals(Role.ADMIN)) {
+            throw AppException.badRequest("You are not authorized for this process");
+        }
+
+        authRepository.
+        return new AppResponse<String>(true, "Update Successful", "");
     }
 
     public AppResponse<Auth> myInfo(UUID authId) {
