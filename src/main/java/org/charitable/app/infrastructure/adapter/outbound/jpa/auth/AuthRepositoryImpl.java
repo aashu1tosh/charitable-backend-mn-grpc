@@ -5,6 +5,7 @@ import org.charitable.app.application.exception.AppException;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.entity.user.User;
+import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.infrastructure.mapper.admin.AdminMapper;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
@@ -103,16 +104,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
     @Override
     public Auth save(Auth auth) {
-//        var entity = new AuthEntity(
-//                auth.getEmail(),
-//                auth.getPassword(),
-//                auth.getPhone(),
-//                auth.getRole(),
-//                auth.getIsEmailVerified(),
-//                auth.getStatus(),
-//                OrganizationMapper.mapToEntitySafe(auth.getOrganization()),
-//                UserMapper.mapToSafeEntity(auth.getUser())
-//        );
 
         var entity = AuthEntity.builder()
                 .email(auth.getEmail())
@@ -130,6 +121,18 @@ class AuthRepositoryImpl implements AuthRepository {
         var savedEntity = jpaRepository.save(entity);
         logger.info("Saved user: {}", savedEntity);
         return mapToDomain(savedEntity);
+    }
+
+
+    @Override
+    public Auth updateAuthStatus(UUID id, AuthStatus status) {
+        var resp = jpaRepository.updateAuthStatus(id, status);
+
+        if(resp.isEmpty()) {
+            throw AppException.badRequest("Requested data not found");
+        }
+
+        return mapToDomain(resp.get());
     }
 
     public static Auth mapToDomain(AuthEntity entity) {

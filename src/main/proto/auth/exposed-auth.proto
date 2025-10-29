@@ -12,6 +12,8 @@ service AuthService {
   rpc RegisterOrganization (RegisterOrganizationRequest) returns (CommonResponse);
   rpc RegisterAdmin(RegisterAdminRequest) returns (CommonResponse);
 
+  rpc UpdateAuthStatus(UpdateAuthStatusRequest) returns (CommonResponse);
+
   rpc MyInfo(EmptyRequest) returns (MyInfoResponse);
   rpc Logout (LogoutRequest) returns (CommonResponse);
 }
@@ -76,6 +78,11 @@ message RegisterOrganizationRequest {
 
 
 message LogoutRequest {}
+
+message UpdateAuthStatusRequest {
+  string auth_id = 1;
+  AuthStatus status = 2;
+}
 
 message MyInfoData {
   string email = 1;

@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
+import org.charitable.app.application.dto.request.auth.UpdateAuthStatusDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
+import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.model.Role;
@@ -248,6 +250,27 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
                 .setSuccess(true)
                 .setMessage(resp.getMessage())
                 .setData(infoData)
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @GrpcAuthenticate(roles = {Role.ADMIN, Role.SUDO_ADMIN})
+    public void updateAuthStatus(UpdateAuthStatusRequest request, StreamObserver<CommonResponse> responseObserver) {
+        logger.info("Update auth status request received.");
+        var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
+        var data = UpdateAuthStatusDTO.builder()
+                .id(UUIDUtils.stringToUUID(request.getAuthId()))
+                .authStatus(org.charitable.app.infrastructure.grpc.mapper.AuthStatusMapper.fromProto(request.getStatus()))
+                .build();
+
+        validator.validate(data);
+        var resp = authUseCase.updateAuthStatus(data, tokenPayload);
+
+        CommonResponse response = CommonResponse.newBuilder()
+                .setSuccess(resp.isSuccess())
+                .setMessage(resp.getMessage())
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
