@@ -1,4 +1,4 @@
-package org.charitable.app.application.service;
+package org.charitable.app.application.service.admin;
 
 import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;

@@ -1,6 +1,5 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
-import io.micronaut.data.annotation.MappedEntity;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.Email;

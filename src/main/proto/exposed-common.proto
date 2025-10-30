@@ -27,6 +27,20 @@ enum AuthStatus {
   DELETED = 4;
 }
 
+enum DonationType {
+  DONATION_UNSPECIFIED = 0;
+  BOOKS = 1;
+  CLOTHES = 2;
+}
+
+enum DonationStatus {
+  DONATION_STATUS_UNSPECIFIED = 0;
+  AVAILABLE = 1;
+  CLAIMED = 2;
+  RECEIVED = 3;
+  CANCELLED = 4;
+}
+
 message Organization {
   string name = 1;
   string address = 2;
