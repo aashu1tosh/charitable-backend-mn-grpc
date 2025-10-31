@@ -3,6 +3,7 @@ package org.charitable.app.infrastructure.adapter.inbound.grpc.request.donation;
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
+import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
 import org.charitable.app.common.utils.ValidationUtils;
@@ -50,5 +51,11 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getDonations(GetDonationRequest request, StreamObserver<CommonResponse> responseObserver) {
+
+        throw AppException.internal("Method not implemented");
     }
 }
