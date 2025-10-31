@@ -24,5 +24,4 @@ message GetDonationRequest {
   string search = 3;
   DonationType type = 4;
   DonationStatus status = 5;
-
 }

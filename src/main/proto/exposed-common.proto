@@ -37,7 +37,7 @@ enum DonationStatus {
   DONATION_STATUS_UNSPECIFIED = 0;
   AVAILABLE = 1;
   CLAIMED = 2;
-  RECEIVED = 3;
+  DONATED = 3;
   CANCELLED = 4;
 }
 
