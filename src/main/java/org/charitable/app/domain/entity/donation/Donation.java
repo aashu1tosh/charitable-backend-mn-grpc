@@ -15,6 +15,7 @@ import org.charitable.app.domain.model.donation.DonationType;
 public class Donation extends Base {
     private String title;
     private String description;
+    private String url;
     private Auth donor;
     private DonationType type;
     private DonationStatus status;

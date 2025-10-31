@@ -19,4 +19,5 @@ public interface AuthUseCase {
     AppResponse<String> registerAdmin(AuthRegisterRequestDTO authRegisterRequestDTO, AdminRegisterRequestDTO adminRegisterRequestDTO);
     AppResponse<String> updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user);
     AppResponse<Auth> myInfo(UUID authId);
+    Auth findById(UUID id);
 }

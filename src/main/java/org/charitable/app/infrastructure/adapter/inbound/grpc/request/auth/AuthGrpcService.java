@@ -37,8 +37,6 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     @Override
     public void login(LoginRequest request, StreamObserver<LoginResponse> responseObserver) {
             logger.info("Received login request for user: {}", request.getUsername());
-            String username = request.getUsername();
-            String password = request.getPassword();
 
             var dto = new LoginRequestDTO(request.getUsername(), request.getPassword());
 

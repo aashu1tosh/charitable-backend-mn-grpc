@@ -28,7 +28,7 @@ public class AuthMapper {
                 auth.getRole(),
                 auth.getIsEmailVerified(),
                 auth.getStatus(),
-                OrganizationMapper.mapToEntitySafe(auth.getOrganization()),
+                null,
                 null,
                 null
         );

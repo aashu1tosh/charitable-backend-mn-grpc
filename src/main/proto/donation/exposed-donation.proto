@@ -15,4 +15,5 @@ message UserDonationRequest {
   string title = 1;
   string description = 2;
   DonationType type = 3;
+  string product_url = 4;
 }

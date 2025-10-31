@@ -3,6 +3,7 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.donation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.donation.DonationType;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
@@ -35,6 +36,9 @@ public class DonationEntity extends BaseEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     private DonationStatus status;
+
+    @Column()
+    private String url;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "donor_auth_id", nullable = true)

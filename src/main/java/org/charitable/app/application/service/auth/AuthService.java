@@ -188,4 +188,8 @@ class AuthService implements AuthUseCase {
 
         return new AppResponse<Auth>(true, "Information fetched Successfully", auth);
     }
+
+    public Auth findById(UUID id) {
+        return authRepository.findById(id);
+    }
 }
