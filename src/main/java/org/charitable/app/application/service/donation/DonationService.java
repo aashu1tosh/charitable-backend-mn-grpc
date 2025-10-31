@@ -36,7 +36,6 @@ public class DonationService implements DonationUseCase {
                 .url(req.getUrl() != null ?  req.getUrl() : null)
                 .build();
 
-        donationRepository.save(donation);
-        throw AppException.internal("Method not Implemented");
+        return donationRepository.save(donation);
     }
 }

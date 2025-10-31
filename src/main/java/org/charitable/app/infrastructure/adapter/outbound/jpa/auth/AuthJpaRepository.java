@@ -17,6 +17,7 @@ public interface AuthJpaRepository extends JpaRepository<AuthEntity, UUID> {
     SELECT a FROM AuthEntity a
     LEFT JOIN FETCH a.organization
     LEFT JOIN FETCH a.user
+    LEFT JOIN FETCH a.admin
     WHERE a.id = :id
 """)
     Optional<AuthEntity> findByIdWithRelations(UUID id);

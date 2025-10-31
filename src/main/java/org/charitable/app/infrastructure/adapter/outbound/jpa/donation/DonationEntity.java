@@ -40,7 +40,7 @@ public class DonationEntity extends BaseEntity {
     @Column()
     private String url;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "donor_auth_id", nullable = true)
     private AuthEntity donor;
 

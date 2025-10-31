@@ -127,6 +127,8 @@ class JwtProvider implements AuthTokenManager {
                     .userId(attributes.get("userId") != null ? (UUID) attributes.get("userId") : null)
                     .build();
 
+            logger.info("User Information {}", tokenPayload);
+
             return tokenPayload;
         } catch (AppException e) {
             throw e;
