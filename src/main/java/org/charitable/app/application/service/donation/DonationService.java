@@ -12,7 +12,6 @@ import org.charitable.app.domain.entity.donation.Donation;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.donation.DonationRepository;
-import org.charitable.app.proto.GetDonationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,11 +19,11 @@ import org.slf4j.LoggerFactory;
 public class DonationService implements DonationUseCase {
     private static final Logger logger = LoggerFactory.getLogger(DonationService.class);
 
-    private final DonationRepository donationRepository;
+    private final DonationRepository donationRepo;
     private final AuthUseCase authService;
 
     public DonationService(DonationRepository donationRepository, AuthUseCase authService) {
-        this.donationRepository = donationRepository;
+        this.donationRepo = donationRepository;
         this.authService = authService;
     }
 
@@ -44,6 +43,8 @@ public class DonationService implements DonationUseCase {
 
     @Override
     public AppResponse<Donation> getDonation(GetDonationFilterDTO request, TokenPayload user) {
+
+        donationRepo.getDonations(user);
         throw AppException.internal("Method not Implemented");
     }
 }
