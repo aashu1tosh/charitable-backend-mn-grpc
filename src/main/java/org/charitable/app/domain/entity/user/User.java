@@ -17,7 +17,7 @@ public class User extends Base {
     private String firstName;
     private String middleName;
     private String lastName;
-    private float latitude;
-    private float longitude;
+    private Float latitude;
+    private Float longitude;
     private Auth auth;
 }

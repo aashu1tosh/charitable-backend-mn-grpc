@@ -24,10 +24,10 @@ public class UserEntity extends BaseEntity {
     private String lastName;
 
     @Column(name = "latitude")
-    private float latitude;
+    private Float latitude;
 
     @Column(name = "longitude")
-    private float longitude;
+    private Float longitude;
 
     @OneToOne(mappedBy = "user")
     private AuthEntity auth;

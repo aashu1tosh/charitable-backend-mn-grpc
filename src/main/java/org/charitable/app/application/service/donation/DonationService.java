@@ -8,7 +8,9 @@ import org.charitable.app.application.dto.response.AppResponse;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
+import org.charitable.app.domain.common.pagination.Page;
 import org.charitable.app.domain.entity.donation.Donation;
+import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.donation.DonationRepository;
@@ -42,9 +44,16 @@ public class DonationService implements DonationUseCase {
     }
 
     @Override
-    public AppResponse<Donation> getDonation(GetDonationFilterDTO request, TokenPayload user) {
+    public AppResponse<Page<Donation>> getDonation(GetDonationFilterDTO request, TokenPayload user) {
+        var filter = DonationFilter.builder()
+                .limit(request.getLimit())
+                .page(request.getPage())
+                .search(request.getSearch())
+                .status(request.getStatus())
+                .type(request.getType())
+                .build();
 
-        donationRepo.getDonations(user);
-        throw AppException.internal("Method not Implemented");
+        var resp = donationRepo.getDonations(filter, user);
+        return new AppResponse<>(true, "Fetched Successfully", resp);
     }
 }

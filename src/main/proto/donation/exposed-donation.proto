@@ -8,7 +8,7 @@ import "exposed-common.proto";
 
 service DonationService {
   rpc Donate(UserDonationRequest) returns (CommonResponse);
-  rpc GetDonations(GetDonationRequest) returns (CommonResponse);
+  rpc GetDonations(GetDonationRequest) returns (GetDonationResponse);
 }
 
 message UserDonationRequest {
@@ -24,4 +24,20 @@ message GetDonationRequest {
   string search = 3;
   DonationType type = 4;
   DonationStatus status = 5;
+}
+
+message DonationItems {
+  string title = 1;
+  string description = 2;
+
+}
+message PageDonation {
+  DonationItems data = 1;
+  Pagination pagination = 2;
+}
+
+message GetDonationResponse {
+  bool success = 1;
+  string message = 2;
+  PageDonation data = 3;
 }

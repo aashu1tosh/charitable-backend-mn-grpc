@@ -12,6 +12,5 @@ public class DonationFilter {
     private final DonationStatus status;
     private final int page;
     private final int limit;
-
 }
 
