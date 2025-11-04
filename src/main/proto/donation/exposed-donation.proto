@@ -31,8 +31,9 @@ message DonationItems {
   string description = 2;
 
 }
+
 message PageDonation {
-  DonationItems data = 1;
+  repeated DonationItems data = 1;
   Pagination pagination = 2;
 }
 

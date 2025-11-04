@@ -8,6 +8,7 @@ import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
 import org.charitable.app.common.utils.ValidationUtils;
+import org.charitable.app.domain.entity.donation.Donation;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.context.GrpcContextKeys;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticate;
@@ -25,8 +26,6 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
     private final DonationUseCase donationService;
     private final ValidationUtils validator;
-
-
 
     public DonationGrpcService(DonationUseCase donationService, ValidationUtils validator) {
         this.donationService = donationService;
@@ -78,19 +77,30 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
         var pagination = PaginationMapper.toProtoPagination(resp.getData().getPagination());
 
-        var data = DonationItems.newBuilder()
-                .setTitle(items.get(0).getTitle())
-                .setDescription(items.get(0).getDescription())
-                .build();
+//        var data = DonationItems.newBuilder()
+//                .setTitle
+//                .setDescription(items.get(0).getDescription())
+//                .build();
 
-        var respData = PageDonation.newBuilder()
-                .setData(data)
-                .setPagination(pagination)
-                .build();
+        PageDonation.Builder pageDonationBuilder = PageDonation.newBuilder();
+
+        for (Donation domain : items) {
+            DonationItems donationItem = DonationItems.newBuilder()
+                    .setTitle(domain.getTitle())
+                    .setDescription(domain.getDescription())
+                    .build();
+
+            pageDonationBuilder.addData(donationItem);
+        }
+
+        pageDonationBuilder.setPagination(pagination);
+        PageDonation pageDonation = pageDonationBuilder.build();
+
+
         GetDonationResponse response = GetDonationResponse.newBuilder()
                 .setSuccess(resp.isSuccess())
                 .setMessage(resp.getMessage())
-                .setData(respData)
+                .setData(pageDonation)
                 .build();
 
         responseObserver.onNext(response);
