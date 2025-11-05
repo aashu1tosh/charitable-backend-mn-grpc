@@ -5,8 +5,6 @@ import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.donation.ClaimDonationRequestDTO;
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
 import org.charitable.app.application.dto.request.donation.GetDonationFilterDTO;
-import org.charitable.app.application.exception.AppException;
-import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
 import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
@@ -18,7 +16,6 @@ import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.D
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.DonationStatusMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.DonationTypeMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.pagination.PaginationMapper;
-import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.charitable.app.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +48,8 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
         var resp = donationService.donate(req, tokenPayload);
 
         CommonResponse response = CommonResponse.newBuilder()
-                .setSuccess(resp.isSuccess())
-                .setMessage(resp.getMessage())
+                .setSuccess(true)
+                .setMessage("Donated Successfully")
                 .build();
 
         responseObserver.onNext(response);
@@ -74,11 +71,11 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
         var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
 
         var resp = donationService.getDonation(filter,tokenPayload);
-        var items = resp.getData().getItems();
+        var items = resp.getItems();
 
         logger.info("See what the response is: {}", resp);
 
-        var pagination = PaginationMapper.toProtoPagination(resp.getData().getPagination());
+        var pagination = PaginationMapper.toProtoPagination(resp.getPagination());
 
         PageDonation.Builder pageDonationBuilder = PageDonation.newBuilder();
 
@@ -92,8 +89,8 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
 
         GetDonationResponse response = GetDonationResponse.newBuilder()
-                .setSuccess(resp.isSuccess())
-                .setMessage(resp.getMessage())
+                .setSuccess(true)
+                .setMessage("Donated Successfully")
                 .setData(pageDonation)
                 .build();
 
@@ -128,5 +125,12 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
     @GrpcAuthenticate(roles = {Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_SUPER_ADMIN})
     public void gotDonation(GotDonationRequest request, StreamObserver<CommonResponse> responseObserver) {
 
+        CommonResponse response = CommonResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Action completed successfully")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 }

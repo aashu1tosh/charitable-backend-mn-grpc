@@ -9,7 +9,7 @@ import org.charitable.app.domain.entity.donation.Donation;
 import org.charitable.app.domain.model.token.TokenPayload;
 
 public interface DonationUseCase {
-    AppResponse<Donation> donate(DonateRequestDTO data, TokenPayload user);
-    AppResponse<Page<Donation>> getDonation(GetDonationFilterDTO data, TokenPayload user);
+    Donation donate(DonateRequestDTO data, TokenPayload user);
+    Page<Donation> getDonation(GetDonationFilterDTO data, TokenPayload user);
     Donation claimDonation(ClaimDonationRequestDTO data, TokenPayload user);
 }

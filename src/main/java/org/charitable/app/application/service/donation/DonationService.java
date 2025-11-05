@@ -32,7 +32,7 @@ public class DonationService implements DonationUseCase {
     }
 
     @Override
-    public AppResponse<Donation> donate(DonateRequestDTO req, TokenPayload user) {
+    public Donation donate(DonateRequestDTO req, TokenPayload user) {
         var donation = Donation.builder()
                 .title(req.getTitle())
                 .description(req.getDescription())
@@ -42,11 +42,11 @@ public class DonationService implements DonationUseCase {
                 .url(req.getUrl() != null ?  req.getUrl() : null)
                 .build();
 
-        return new AppResponse<>(true, "Donation Successful", donation);
+        return donationRepo.save(donation);
     }
 
     @Override
-    public AppResponse<Page<Donation>> getDonation(GetDonationFilterDTO request, TokenPayload user) {
+    public Page<Donation> getDonation(GetDonationFilterDTO request, TokenPayload user) {
         var filter = DonationFilter.builder()
                 .limit(request.getLimit())
                 .page(request.getPage())
@@ -55,10 +55,8 @@ public class DonationService implements DonationUseCase {
                 .type(request.getType())
                 .build();
 
-        var resp = donationRepo.getDonations(filter, user);
-        return new AppResponse<>(true, "Fetched Successfully", resp);
+        return donationRepo.getDonations(filter, user);
     }
-
 
     @Override
     public Donation claimDonation(ClaimDonationRequestDTO request, TokenPayload user) {
