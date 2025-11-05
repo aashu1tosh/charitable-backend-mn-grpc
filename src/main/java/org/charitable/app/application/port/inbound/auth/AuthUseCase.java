@@ -8,16 +8,17 @@ import org.charitable.app.application.dto.request.organization.OrganizationRegis
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.dto.response.AppResponse;
 import org.charitable.app.domain.entity.auth.Auth;
+import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.model.token.TokenPayload;
 
 import java.util.UUID;
 
 public interface AuthUseCase {
-    AppResponse<?> login(LoginRequestDTO loginRequestDTO);
-    AppResponse<String> registerOrganization(AuthRegisterRequestDTO authRegisterRequestDTO, OrganizationRegisterRequestDTO organizationRegisterRequestDTO, AdminRegisterRequestDTO admin);
-    AppResponse<String> registerUser(AuthRegisterRequestDTO authRegisterRequestDTO, UserRegisterRequestDTO userRegisterRequestDTO);
-    AppResponse<String> registerAdmin(AuthRegisterRequestDTO authRegisterRequestDTO, AdminRegisterRequestDTO adminRegisterRequestDTO);
-    AppResponse<String> updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user);
-    AppResponse<Auth> myInfo(UUID authId);
+    IdentityTokens login(LoginRequestDTO loginRequestDTO);
+    String registerOrganization(AuthRegisterRequestDTO authRegisterRequestDTO, OrganizationRegisterRequestDTO organizationRegisterRequestDTO, AdminRegisterRequestDTO admin);
+    String registerUser(AuthRegisterRequestDTO authRegisterRequestDTO, UserRegisterRequestDTO userRegisterRequestDTO);
+    String registerAdmin(AuthRegisterRequestDTO authRegisterRequestDTO, AdminRegisterRequestDTO adminRegisterRequestDTO);
+    String updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user);
+    Auth myInfo(UUID authId);
     Auth findById(UUID id);
 }

@@ -43,12 +43,15 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
             validator.validate(dto);
 
             var result = authUseCase.login(dto);
-            IdentityTokens tokens = (IdentityTokens) result.getData();
 
-            var responseToken = AuthTokenResponse.newBuilder().setAccessToken(tokens.getAccessToken()).setRefreshToken(tokens.getRefreshToken()).build();
+            var responseToken = AuthTokenResponse.newBuilder()
+                    .setAccessToken(result.getAccessToken())
+                    .setRefreshToken(result.getRefreshToken())
+                    .build();
+
             var response = LoginResponse.newBuilder()
-                    .setSuccess(result.isSuccess())
-                            .setMessage(result.getMessage())
+                            .setSuccess(true)
+                            .setMessage("Login successful")
                             .setData(responseToken).build();
 
             responseObserver.onNext(response);
@@ -135,8 +138,8 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         var resp = authUseCase.registerOrganization(auth, org, admin);
 
         CommonResponse response = CommonResponse.newBuilder()
-                .setSuccess(resp.isSuccess())
-                .setMessage(resp.getMessage())
+                .setSuccess(true)
+                .setMessage(resp)
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -175,8 +178,8 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         var rsp = authUseCase.registerAdmin(auth, admin);
 
         CommonResponse response = CommonResponse.newBuilder()
-                .setSuccess(rsp.isSuccess())
-                .setMessage(rsp.getMessage())
+                .setSuccess(true)
+                .setMessage(rsp)
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -191,12 +194,11 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 
         var resp = authUseCase.myInfo(tokenPayload.getId());
 
-        logger.info("My info log {}", resp.getData());
         logger.info("Receive my info response: {}", resp);
 
         Organization orgData = null;
-        if (resp.getData().getOrganization() != null && resp.getData().getOrganization().getId() != null) {
-            var org = resp.getData().getOrganization();
+        if (resp.getOrganization() != null && resp.getId() != null) {
+            var org = resp.getOrganization();
             orgData = Organization.newBuilder()
                     .setName(org.getName())
                     .setAddress(org.getAddress())
@@ -208,9 +210,9 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         }
 
         org.charitable.app.proto.User user = null;
-        if (resp.getData().getUser() != null && resp.getData().getUser().getId() != null) {
-            logger.info("Receive my info user {}", resp.getData().getUser().getId());
-            var usr = resp.getData().getUser();
+        if (resp.getUser() != null && resp.getId() != null) {
+            logger.info("Receive my info user {}", resp.getUser().getId());
+            var usr = resp.getUser();
             user = User.newBuilder()
                     .setFirstName(usr.getFirstName())
                     .setMiddleName(usr.getMiddleName())
@@ -221,16 +223,16 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         }
 
         MyInfoData.Builder infoBuilder = MyInfoData.newBuilder()
-                .setEmail(resp.getData().getEmail())
-                .setPhone(resp.getData().getPhone())
+                .setEmail(resp.getEmail())
+                .setPhone(resp.getPhone())
                 .setRole(
-                        resp.getData().getRole() != null
-                                ? org.charitable.app.proto.Role.valueOf(resp.getData().getRole().name())
+                        resp.getRole() != null
+                                ? org.charitable.app.proto.Role.valueOf(resp.getRole().name())
                                 : org.charitable.app.proto.Role.ROLE_UNSPECIFIED
                 )
                 .setStatus(
-                        resp.getData().getStatus() != null
-                                ? org.charitable.app.proto.AuthStatus.valueOf(resp.getData().getStatus().name())
+                        resp.getStatus() != null
+                                ? org.charitable.app.proto.AuthStatus.valueOf(resp.getStatus().name())
                                 : org.charitable.app.proto.AuthStatus.STATUS_UNSPECIFIED
                 );
 
@@ -246,7 +248,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 
         MyInfoResponse response = MyInfoResponse.newBuilder()
                 .setSuccess(true)
-                .setMessage(resp.getMessage())
+                .setMessage("Data fetch successfully")
                 .setData(infoData)
                 .build();
         responseObserver.onNext(response);
@@ -267,8 +269,8 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         var resp = authUseCase.updateAuthStatus(data, tokenPayload);
 
         CommonResponse response = CommonResponse.newBuilder()
-                .setSuccess(resp.isSuccess())
-                .setMessage(resp.getMessage())
+                .setSuccess(true)
+                .setMessage(resp)
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

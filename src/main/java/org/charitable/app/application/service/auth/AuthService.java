@@ -52,7 +52,7 @@ class AuthService implements AuthUseCase {
         this.adminService = adminService;
     }
 
-    public AppResponse<?> login(LoginRequestDTO data) {
+    public IdentityTokens login(LoginRequestDTO data) {
         logger.info("Service login for user: {}", data.getUsername());
 
         var auth = authRepository.findByEmail(data.getUsername());
@@ -60,16 +60,14 @@ class AuthService implements AuthUseCase {
         logger.info("Found auth for user: {}", auth);
 
         if (auth.isEmpty() || !passwordHash.matches(data.getPassword(), auth.get().getPassword())) {
-            return new AppResponse<>(false, "Invalid email or password", "");
+            throw AppException.badRequest("Invalid credentials");
         }
 
-        var token = tokenService.generateToken(auth.get());
-        logger.info("New token for user: {}", token);
-        return new AppResponse<IdentityTokens>(true, "Login successful", token);
+        return tokenService.generateToken(auth.get());
     }
 
     @Transactional
-    public AppResponse<String> registerOrganization(AuthRegisterRequestDTO data, OrganizationRegisterRequestDTO organization, AdminRegisterRequestDTO admin) {
+    public String registerOrganization(AuthRegisterRequestDTO data, OrganizationRegisterRequestDTO organization, AdminRegisterRequestDTO admin) {
         logger.info("Service register organization for user: {}", data.getEmail());
 
         var existingAuth = authRepository.findByEmail(data.getEmail());
@@ -81,18 +79,6 @@ class AuthService implements AuthUseCase {
         var savedAdmin = adminService.register(admin);
 
         String hashedPassword = passwordHash.hash(data.getPassword());
-
-//        var auth = new Auth(
-//                data.getEmail(),
-//                hashedPassword,
-//                data.getPhone(),
-//                data.getRole(),
-//                false,
-//                data.getStatus(),
-//                savedOrg,
-//                null,
-//                null
-//        );
 
         var auth = Auth.builder()
                 .email(data.getEmail())
@@ -109,11 +95,11 @@ class AuthService implements AuthUseCase {
 
         logger.info("Registered new organization with ID: {}", newAuth.getId());
 
-        return new AppResponse<String>(true, "Registration successful", "");
+        return "Registration successful";
     }
 
     @Transactional
-    public AppResponse<String> registerAdmin(AuthRegisterRequestDTO data, AdminRegisterRequestDTO admin) {
+    public String registerAdmin(AuthRegisterRequestDTO data, AdminRegisterRequestDTO admin) {
         var existingAuth = authRepository.findByEmail(data.getEmail());
         if (existingAuth.isPresent()) {
             throw AppException.badRequest("Email already in user");
@@ -132,11 +118,11 @@ class AuthService implements AuthUseCase {
                 .build();
 
         authRepository.save(auth);
-        return new AppResponse<String>(true, "Registration successful", "");
+        return "Registration successful";
     }
 
     @Transactional
-    public AppResponse<String> registerUser(AuthRegisterRequestDTO data, UserRegisterRequestDTO user) {
+    public String registerUser(AuthRegisterRequestDTO data, UserRegisterRequestDTO user) {
         logger.info("Service register user for email: {}", data.getEmail());
 
         var existingAuth = authRepository.findByEmail(data.getEmail());
@@ -162,10 +148,10 @@ class AuthService implements AuthUseCase {
 
         logger.info("Registered new user with ID: {}", newAuth.getId());
 
-        return new AppResponse<String>(true, "Registration successful", "dummy-token-for-" + newAuth.getId());
+        return "Registration successful";
     }
 
-    public AppResponse<String> updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user) {
+    public String updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user) {
         var auth = authRepository.findById(data.getId());
 
         var prjRole = auth.getRole();
@@ -179,14 +165,12 @@ class AuthService implements AuthUseCase {
         }
 
         authRepository.updateAuthStatus(data.getId(), data.getAuthStatus());
-        return new AppResponse<String>(true, "Update Successful", "");
+        return "Update Successful";
     }
 
-    public AppResponse<Auth> myInfo(UUID authId) {
+    public Auth myInfo(UUID authId) {
         logger.info("Service myInfo for authId: {}", authId);
-        var auth = authRepository.findMyInfo(authId);
-
-        return new AppResponse<Auth>(true, "Information fetched Successfully", auth);
+        return  authRepository.findMyInfo(authId);
     }
 
     public Auth findById(UUID id) {
