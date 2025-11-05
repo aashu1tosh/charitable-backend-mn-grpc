@@ -1,5 +1,6 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.donation;
 
+import io.micronaut.http.server.exceptions.NotFoundException;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 class DonationRepositoryImpl implements DonationRepository {
@@ -123,5 +125,10 @@ class DonationRepositoryImpl implements DonationRepository {
                 .build();
 
         return new Page<Donation>(donations, pagination);
+    }
+
+    @Override
+    public Donation claimDonation(UUID id, UUID organization) {
+        throw new RuntimeException("Method not implemented");
     }
 }

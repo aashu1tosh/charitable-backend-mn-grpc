@@ -2,16 +2,19 @@ package org.charitable.app.infrastructure.adapter.inbound.grpc.request.donation;
 
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Singleton;
+import org.charitable.app.application.dto.request.donation.ClaimDonationRequestDTO;
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
 import org.charitable.app.application.dto.request.donation.GetDonationFilterDTO;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
+import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.entity.donation.Donation;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.context.GrpcContextKeys;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.interceptor.authentication.GrpcAuthenticate;
+import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.DonationMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.DonationStatusMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.DonationTypeMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.pagination.PaginationMapper;
@@ -77,19 +80,10 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
         var pagination = PaginationMapper.toProtoPagination(resp.getData().getPagination());
 
-//        var data = DonationItems.newBuilder()
-//                .setTitle
-//                .setDescription(items.get(0).getDescription())
-//                .build();
-
         PageDonation.Builder pageDonationBuilder = PageDonation.newBuilder();
 
         for (Donation domain : items) {
-            DonationItems donationItem = DonationItems.newBuilder()
-                    .setTitle(domain.getTitle())
-                    .setDescription(domain.getDescription())
-                    .build();
-
+            DonationItems donationItem = DonationMapper.toProto(domain);
             pageDonationBuilder.addData(donationItem);
         }
 
@@ -105,6 +99,34 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+
+    }
+
+    @Override
+    @GrpcAuthenticate(roles = {Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_SUPER_ADMIN})
+    public void claimDonation(ClaimDonationRequest request, StreamObserver<CommonResponse> responseObserver) {
+        var req = ClaimDonationRequestDTO.builder()
+                .id(UUIDUtils.stringToUUID(request.getDonationId()))
+                .build();
+
+        validator.validate(req);
+
+        var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
+
+        var resp = donationService.claimDonation(req, tokenPayload);
+
+        CommonResponse response = CommonResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Claim Success")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @GrpcAuthenticate(roles = {Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_SUPER_ADMIN})
+    public void gotDonation(GotDonationRequest request, StreamObserver<CommonResponse> responseObserver) {
 
     }
 }

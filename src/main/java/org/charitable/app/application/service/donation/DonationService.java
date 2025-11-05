@@ -2,6 +2,7 @@ package org.charitable.app.application.service.donation;
 
 
 import jakarta.inject.Singleton;
+import org.charitable.app.application.dto.request.donation.ClaimDonationRequestDTO;
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
 import org.charitable.app.application.dto.request.donation.GetDonationFilterDTO;
 import org.charitable.app.application.dto.response.AppResponse;
@@ -14,6 +15,7 @@ import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.donation.DonationRepository;
+import org.charitable.app.proto.ClaimDonationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,5 +57,11 @@ public class DonationService implements DonationUseCase {
 
         var resp = donationRepo.getDonations(filter, user);
         return new AppResponse<>(true, "Fetched Successfully", resp);
+    }
+
+
+    @Override
+    public Donation claimDonation(ClaimDonationRequestDTO request, TokenPayload user) {
+        return donationRepo.claim(request.getId(), user.getOrganizationId());
     }
 }

@@ -2,37 +2,39 @@ package org.charitable.app.common.utils;
 
 import lombok.NoArgsConstructor;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 @NoArgsConstructor
 public class ValueUtils {
 
+        // --- String ---
+        public static boolean checkNullOrEmpty(String value) {
+            return value == null || value.trim().isEmpty();
+        }
 
-    /**
-     * Safely returns the given value or a default one if null.
-     *
-     * @param value        the input value
-     * @param defaultValue the fallback value if input is null
-     * @return the value or defaultValue
-     */
-    public static <T> T safe(T value, T defaultValue) {
-        return Optional.ofNullable(value).orElse(defaultValue);
-    }
+        // --- Collection (List, Set, etc.) ---
+        public static boolean checkNullOrEmpty(Collection<?> value) {
+            return value == null || value.isEmpty();
+        }
 
-    // If no default is given, just return null-safe value as-is
-    public static <T> T safe(T value) {
-        return value;
-    }
+        // --- Map ---
+        public static boolean checkNullOrEmpty(Map<?, ?> value) {
+            return value == null || value.isEmpty();
+        }
 
-    /**
-     * Safely converts a value to String.
-     *
-     * @param value the input value
-     * @return the string value or empty string if null
-     */
-    public static String safeString(Object value) {
-        return Optional.ofNullable(value)
-                .map(Object::toString)
-                .orElse("");
-    }
+        // --- Array ---
+        public static boolean checkNullOrEmpty(Object[] value) {
+            return value == null || value.length == 0;
+        }
+
+        // --- Number (Integer, Float, Double, Long, etc.) ---
+        public static boolean checkNullOrEmpty(Number value) {
+            // Only null is considered empty for numbers
+            // You could add custom logic if you want 0 to also count as "empty"
+            return value == null;
+        }
 }
+
+
