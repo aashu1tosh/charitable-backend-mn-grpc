@@ -62,6 +62,6 @@ public class DonationService implements DonationUseCase {
 
     @Override
     public Donation claimDonation(ClaimDonationRequestDTO request, TokenPayload user) {
-        return donationRepo.claim(request.getId(), user.getOrganizationId());
+        return donationRepo.claimDonation(request.getId(), user.getOrganizationId());
     }
 }
