@@ -1,5 +1,6 @@
 package org.charitable.app.infrastructure.mapper.auth;
 
+import org.charitable.app.common.utils.ValueUtils;
 import org.charitable.app.domain.entity.admin.Admin;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.organization.Organization;
@@ -43,43 +44,23 @@ public class AuthMapper {
                 .build();
     }
 
-    public static AuthEntity mapToEntity(Auth auth) {
-        if (auth == null) {
+    public static AuthEntity mapToEntity(Auth domain) {
+        if (domain == null) {
             return null;
         }
 
-        var entity = new AuthEntity(
-                auth.getEmail(),
-                null,
-                auth.getPhone(),
-                auth.getRole(),
-                auth.getIsEmailVerified(),
-                auth.getStatus(),
-                null,
-                null,
-                null
-        );
-        entity.setId(auth.getId());
-        entity.setCreatedAt(auth.getCreatedAt());
-        entity.setUpdatedAt(auth.getUpdatedAt());
-        return entity;
+        return AuthEntity.builder()
+                .id(!ValueUtils.checkNullOrEmpty(domain.getId()) ? domain.getId() : null)
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
+                .email(domain.getEmail())
+                .role(domain.getRole())
+                .isEmailVerified(domain.getIsEmailVerified())
+                .status(domain.getStatus())
+                .phoneNumber(domain.getPhone())
+                .organization(domain.getOrganization() != null ? OrganizationMapper.mapToEntitySafe(domain.getOrganization()) : null)
+                .user(domain.getUser() != null ? UserMapper.mapToSafeEntity(domain.getUser()) : null)
+                .admin(domain.getAdmin() != null ? AdminMapper.mapToSafeEntity(domain.getAdmin()) : null)
+                .build();
     }
-
-//    private static Auth getAuth(AuthEntity authEntity) {
-//        var auth = new Auth(
-//                authEntity.getEmail(),
-//                null,
-//                authEntity.getPhoneNumber(),
-//                authEntity.getRole(),
-//                authEntity.getIsEmailVerified(),
-//                authEntity.getStatus(),
-//                OrganizationMapper.mapToDomain(authEntity.getOrganization()),
-//                UserMapper.mapToDomain(authEntity.getUser()),
-//                AdminMapper.mapToDomain(authEntity.getAdmin())
-//        );
-//        auth.setId(authEntity.getId());
-//        auth.setCreatedAt(authEntity.getCreatedAt());
-//        auth.setUpdatedAt(authEntity.getUpdatedAt());
-//        return auth;
-//    }
 }

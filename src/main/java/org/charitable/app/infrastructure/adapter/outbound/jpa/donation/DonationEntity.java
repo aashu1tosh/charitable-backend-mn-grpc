@@ -8,7 +8,11 @@ import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.donation.DonationType;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.donation.donationStatusHistory.DonationStatusHistory;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "donation")
@@ -36,6 +40,9 @@ public class DonationEntity extends BaseEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     private DonationStatus status;
+
+    @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DonationStatusHistory> donationStatusHistories = new ArrayList<>();
 
     @Column()
     private String url;

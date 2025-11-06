@@ -8,6 +8,7 @@ import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.infrastructure.mapper.admin.AdminMapper;
+import org.charitable.app.infrastructure.mapper.auth.AuthMapper;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 import org.charitable.app.infrastructure.mapper.user.UserMapper;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ class AuthRepositoryImpl implements AuthRepository {
     public Optional<Auth> findByEmail(String email) {
         return jpaRepository.findByEmail(email)
                 .map(entity -> {
-                    logger.info("Finding user by email: {}, found: {}", email, entity);
                     return mapToDomain(entity);
                 });
     }
@@ -83,23 +83,9 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
-    public Auth findById(UUID id) {
-        var auth = jpaRepository.findById(id);
-
-        if(auth.isEmpty()) {
-            throw AppException.badRequest("Requested data not found");
-        }
-        var entity = auth.get();
-
-        return Auth.builder()
-                .id(entity.getId())
-                .email(entity.getEmail())
-                .phone(entity.getPhoneNumber())
-                .status(entity.getStatus())
-                .role(entity.getRole())
-                .organization(null)
-                .user(null)
-                .build();
+    public Optional<Auth> findById(UUID id) {
+        return jpaRepository.findById(id)
+                .map(AuthMapper::mapToDomain);
     }
 
     @Override

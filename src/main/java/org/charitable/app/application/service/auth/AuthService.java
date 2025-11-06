@@ -152,7 +152,8 @@ class AuthService implements AuthUseCase {
     }
 
     public String updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user) {
-        var auth = authRepository.findById(data.getId());
+        var auth = authRepository.findById(data.getId())
+                .orElseThrow(() -> AppException.badRequest("Auth not found"));
 
         var prjRole = auth.getRole();
 
@@ -174,13 +175,18 @@ class AuthService implements AuthUseCase {
     }
 
     public Auth findById(UUID id) {
-        return authRepository.findById(id);
+
+        var auth = authRepository.findById(id);
+        if(auth.isEmpty()) {
+            throw AppException.badRequest("Auth not found");
+        }
+        return auth.get();
     }
 
     public IdentityTokens refreshToken(String refreshToken) {
         var user = tokenService.validateRefreshToken(refreshToken);
 
-        var auth = authRepository.findById(user.getId());
+        var auth = authRepository.findById(user.getId()).orElseThrow(() -> AppException.badRequest("Auth not found"));
 
         return tokenService.generateToken(auth);
     }

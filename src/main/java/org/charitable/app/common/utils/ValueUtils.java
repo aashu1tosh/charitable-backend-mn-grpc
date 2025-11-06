@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @NoArgsConstructor
 public class ValueUtils {
@@ -12,6 +13,10 @@ public class ValueUtils {
         // --- String ---
         public static boolean checkNullOrEmpty(String value) {
             return value == null || value.trim().isEmpty();
+        }
+
+        public static boolean checkNullOrEmpty(UUID value) {
+            return value == null;
         }
 
         // --- Collection (List, Set, etc.) ---
