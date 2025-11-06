@@ -31,6 +31,8 @@ message GetDonationRequest {
 
 message DonationItems {
   string id = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
   string title = 1;
   string description = 2;
   string url = 3;

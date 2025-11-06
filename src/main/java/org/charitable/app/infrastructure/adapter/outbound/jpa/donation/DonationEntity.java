@@ -3,6 +3,7 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.donation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.donation.DonationType;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
@@ -15,7 +16,7 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.Organ
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class DonationEntity extends BaseEntity {
 
     @Column()

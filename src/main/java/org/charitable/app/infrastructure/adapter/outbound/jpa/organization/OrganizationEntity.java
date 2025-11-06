@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 
@@ -11,7 +12,7 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 @Table(name = "organization")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrganizationEntity extends BaseEntity {

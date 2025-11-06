@@ -5,6 +5,7 @@ import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.donation.ClaimDonationRequestDTO;
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
 import org.charitable.app.application.dto.request.donation.GetDonationFilterDTO;
+import org.charitable.app.application.dto.request.donation.GotDonationRequestDTO;
 import org.charitable.app.application.dto.response.AppResponse;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
@@ -15,6 +16,7 @@ import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.donation.DonationRepository;
+import org.charitable.app.domain.port.outbound.organization.OrganizationRepository;
 import org.charitable.app.proto.ClaimDonationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +27,12 @@ public class DonationService implements DonationUseCase {
 
     private final DonationRepository donationRepo;
     private final AuthUseCase authService;
+    private final OrganizationRepository organizationRepo;
 
-    public DonationService(DonationRepository donationRepository, AuthUseCase authService) {
+    public DonationService(DonationRepository donationRepository, AuthUseCase authService, OrganizationRepository orgRepo) {
         this.donationRepo = donationRepository;
         this.authService = authService;
+        this.organizationRepo = orgRepo;
     }
 
     @Override
@@ -60,6 +64,47 @@ public class DonationService implements DonationUseCase {
 
     @Override
     public Donation claimDonation(ClaimDonationRequestDTO request, TokenPayload user) {
-        return donationRepo.claimDonation(request.getId(), user.getOrganizationId());
+        var org = organizationRepo.findById(user.getOrganizationId());
+        if(org.isEmpty()) {
+            throw AppException.badRequest("Validate your organization");
+        }
+
+        var donation = donationRepo.findById(request.getId());
+
+        if(donation.isEmpty()) {
+            throw AppException.badRequest("Donation not found");
+        }
+
+        if(donation.get().getStatus() != DonationStatus.AVAILABLE) {
+            throw AppException.badRequest("Donation not available");
+        }
+
+        return donationRepo.claimDonation(request.getId(), org.get());
+    }
+
+    @Override
+    public Donation gotDonation(GotDonationRequestDTO req, TokenPayload user){
+        var org = organizationRepo.findById(user.getOrganizationId());
+        if(org.isEmpty()) {
+            throw AppException.badRequest("Validate your organization");
+        }
+
+        var donationOp = donationRepo.findByIdWithRelations(req.getId());
+
+        if(donationOp.isEmpty()) {
+            throw AppException.badRequest("Donation not found");
+        }
+
+        var donation = donationOp.get();
+
+        if(donation.getStatus() == DonationStatus.AVAILABLE || donation.getOrganization() == null)  {
+            throw AppException.badRequest("Claim the donation first.");
+        }
+
+        if(user.getOrganizationId() != donation.getOrganization().getId()) {
+            throw AppException.badRequest("This donation has been claimed by different organizations.");
+        }
+
+        return donationRepo.gotDonation(donation.getId());
     }
 }

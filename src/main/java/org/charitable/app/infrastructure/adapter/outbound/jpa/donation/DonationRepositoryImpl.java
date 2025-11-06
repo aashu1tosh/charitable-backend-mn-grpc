@@ -1,31 +1,36 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.donation;
 
-import io.micronaut.http.server.exceptions.NotFoundException;
+import io.micronaut.data.annotation.Repository;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
-import org.charitable.app.application.exception.AppException;
 import org.charitable.app.domain.common.pagination.Page;
 import org.charitable.app.domain.common.pagination.Pagination;
 import org.charitable.app.domain.entity.donation.Donation;
+import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.model.donation.DonationFilter;
+import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.donation.DonationRepository;
 import org.charitable.app.infrastructure.mapper.auth.AuthMapper;
 import org.charitable.app.infrastructure.mapper.donation.DonationMapper;
+import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
+@Repository
 class DonationRepositoryImpl implements DonationRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(DonationRepositoryImpl.class);
@@ -36,6 +41,18 @@ class DonationRepositoryImpl implements DonationRepository {
     DonationRepositoryImpl(DonationJpaRepository donationJpaRepo, EntityManager entityManager) {
         this.donationJpaRepo = donationJpaRepo;
         this.entityManager = entityManager;
+    }
+
+    @Override
+    public Optional<Donation> findById(UUID id) {
+         return donationJpaRepo.findById(id)
+                 .map(DonationMapper::mapToDomain);
+    }
+
+    @Override
+    public Optional<Donation> findByIdWithRelations(UUID id) {
+        return donationJpaRepo.findByIdWithRelations(id)
+                .map(DonationMapper::mapToDomain);
     }
 
     @Override
@@ -119,7 +136,8 @@ class DonationRepositoryImpl implements DonationRepository {
                 .toList();
 
         var pagination = Pagination.builder()
-                .limit(page)
+                .page(page)
+                .limit(limit)
                 .total(total)
                 .totalPages(totalPages)
                 .build();
@@ -127,8 +145,37 @@ class DonationRepositoryImpl implements DonationRepository {
         return new Page<Donation>(donations, pagination);
     }
 
+    @Transactional
     @Override
-    public Donation claimDonation(UUID id, UUID organization) {
-        throw new RuntimeException("Method not implemented");
+    public Donation claimDonation(UUID id, Organization organization) {
+        DonationEntity donation = entityManager.find(
+                DonationEntity.class,
+                id,
+                LockModeType.OPTIMISTIC
+        );
+
+        if(donation.getOrganization() != null) {
+            throw new IllegalStateException("Already claimed");
+        }
+
+        donation.setOrganization(OrganizationMapper.mapToEntitySafe(organization));
+        entityManager.persist(donation);
+
+        return DonationMapper.mapToDomain(donation);
     }
+
+    @Transactional
+    @Override
+    public Donation gotDonation(UUID id) {
+
+        DonationEntity donation = entityManager.find(DonationEntity.class, id);
+        if(donation.getOrganization() == null) {
+            throw new IllegalStateException("Claim first");
+        }
+
+        donation.setStatus(DonationStatus.DONATED);
+        entityManager.persist(donation);
+        return DonationMapper.mapToDomain(donation);
+    }
+
 }

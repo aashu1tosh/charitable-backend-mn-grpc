@@ -7,4 +7,5 @@ import org.charitable.app.domain.model.token.TokenPayload;
 public interface AuthTokenManager {
     IdentityTokens generateToken(Auth auth);
     TokenPayload validateAccessToken(String token);
+    TokenPayload validateRefreshToken(String refreshToken);
 }

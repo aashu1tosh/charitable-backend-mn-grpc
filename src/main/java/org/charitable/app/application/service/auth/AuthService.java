@@ -176,4 +176,12 @@ class AuthService implements AuthUseCase {
     public Auth findById(UUID id) {
         return authRepository.findById(id);
     }
+
+    public IdentityTokens refreshToken(String refreshToken) {
+        var user = tokenService.validateRefreshToken(refreshToken);
+
+        var auth = authRepository.findById(user.getId());
+
+        return tokenService.generateToken(auth);
+    }
 }

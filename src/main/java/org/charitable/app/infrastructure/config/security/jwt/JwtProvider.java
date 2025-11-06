@@ -86,8 +86,6 @@ class JwtProvider implements AuthTokenManager {
         return signToken(claims, secret);
     }
 
-
-
     @Override
     public TokenPayload validateAccessToken(String token) {
         try {
@@ -138,6 +136,58 @@ class JwtProvider implements AuthTokenManager {
             throw AppException.internal("Error validating token: " + e.getMessage());
         }
     }
+
+    @Override
+    public TokenPayload validateRefreshToken(String token) {
+        try {
+            logger.info("Provided token: " + token);
+
+            // 1️⃣ Parse the token
+            SignedJWT signedJWT = SignedJWT.parse(token);
+
+            var jwtSecret = envVariables.getJwtRefreshTokenSecret();
+            JWSVerifier verifier = new MACVerifier(jwtSecret);
+            boolean validSignature = signedJWT.verify(verifier);
+
+            if (!validSignature) {
+                throw AppException.unauthorized("Invalid token signature");
+            }
+
+            if (signedJWT.getJWTClaimsSet().getExpirationTime() != null &&
+                    signedJWT.getJWTClaimsSet().getExpirationTime().before(new java.util.Date())) {
+                throw AppException.unauthorized("LOGIN_SESSION_EXPIRED");
+            }
+
+            Optional<Authentication> authentication = jwtAuthenticationFactory.createAuthentication(signedJWT);
+
+            if (authentication.isEmpty()) {
+                throw AppException.unauthorized("Invalid or expired token");
+            }
+
+            Map<String, Object> attributes = authentication.get().getAttributes();
+            logger.info("Authentication attributes: " + attributes);
+
+
+            var tokenPayload = TokenPayload.builder()
+                    .id((UUID) UUIDUtils.stringToUUID(attributes.get("id").toString()))
+                    .role(Role.valueOf(attributes.get("role").toString()))
+                    .organizationId(attributes.get("organizationId") != null ? (UUID) attributes.get("organizationId") : null)
+                    .adminId(attributes.get("adminId") != null ? (UUID) attributes.get("adminId") : null)
+                    .userId(attributes.get("userId") != null ? (UUID) attributes.get("userId") : null)
+                    .build();
+
+            logger.info("User Information {}", tokenPayload);
+
+            return tokenPayload;
+        } catch (AppException e) {
+            throw e;
+        } catch (ParseException e) {
+            throw AppException.unauthorized("Malformed token");
+        } catch (Exception e) {
+            throw AppException.internal("Error validating token: " + e.getMessage());
+        }
+    }
+
 
 
     private String signToken(JWTClaimsSet claims, String secret) throws JOSEException {

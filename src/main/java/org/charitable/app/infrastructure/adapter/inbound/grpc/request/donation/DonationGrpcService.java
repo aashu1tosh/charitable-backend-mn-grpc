@@ -5,6 +5,7 @@ import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.donation.ClaimDonationRequestDTO;
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
 import org.charitable.app.application.dto.request.donation.GetDonationFilterDTO;
+import org.charitable.app.application.dto.request.donation.GotDonationRequestDTO;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
 import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
@@ -124,7 +125,15 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
     @Override
     @GrpcAuthenticate(roles = {Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_SUPER_ADMIN})
     public void gotDonation(GotDonationRequest request, StreamObserver<CommonResponse> responseObserver) {
+        var req = GotDonationRequestDTO.builder()
+                .id(UUIDUtils.stringToUUID(request.getDonationId()))
+                .build();
 
+        validator.validate(req);
+
+        var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
+
+        donationService.gotDonation(req, tokenPayload);
         CommonResponse response = CommonResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Action completed successfully")

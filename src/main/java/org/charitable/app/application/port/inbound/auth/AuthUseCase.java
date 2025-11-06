@@ -21,4 +21,5 @@ public interface AuthUseCase {
     String updateAuthStatus(UpdateAuthStatusDTO data, TokenPayload user);
     Auth myInfo(UUID authId);
     Auth findById(UUID id);
+    IdentityTokens refreshToken(String refreshToken);
 }

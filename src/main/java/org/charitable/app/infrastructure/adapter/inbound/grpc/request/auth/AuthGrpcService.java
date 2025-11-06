@@ -60,6 +60,25 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 }
 
     @Override
+    public void refreshToken(RefreshTokenRequest request, StreamObserver<RefreshTokenResponse> responseObserver) {
+
+        var result = authUseCase.refreshToken(request.getRefreshToken());
+
+        var responseToken = AuthTokenResponse.newBuilder()
+                .setAccessToken(result.getAccessToken())
+                .setRefreshToken(result.getRefreshToken())
+                .build();
+        var response = RefreshTokenResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Token refresh successfully")
+                .setData(responseToken)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void registerUser(RegisterUserRequest request, StreamObserver<CommonResponse> responseObserver) {
 
         String password = request.getPassword();

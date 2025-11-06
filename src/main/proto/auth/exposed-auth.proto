@@ -8,6 +8,7 @@ import "exposed-common.proto";
 
 service AuthService {
   rpc Login (LoginRequest) returns (LoginResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
   rpc RegisterUser (RegisterUserRequest) returns (CommonResponse);
   rpc RegisterOrganization (RegisterOrganizationRequest) returns (CommonResponse);
   rpc RegisterAdmin(RegisterAdminRequest) returns (CommonResponse);
@@ -39,6 +40,16 @@ message AuthTokenResponse {
 }
 
 message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  AuthTokenResponse data =3;
+}
+
+message RefreshTokenRequest {
+  string refreshToken = 1;
+}
+
+message RefreshTokenResponse {
   bool success = 1;
   string message = 2;
   AuthTokenResponse data =3;
