@@ -166,6 +166,7 @@ class AuthService implements AuthUseCase {
         }
 
         authRepository.updateAuthStatus(data.getId(), data.getAuthStatus());
+        authS
         return "Update Successful";
     }
 
