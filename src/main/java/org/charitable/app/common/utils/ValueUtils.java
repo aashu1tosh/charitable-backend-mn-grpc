@@ -2,6 +2,7 @@ package org.charitable.app.common.utils;
 
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -13,6 +14,10 @@ public class ValueUtils {
         // --- String ---
         public static boolean checkNullOrEmpty(String value) {
             return value == null || value.trim().isEmpty();
+        }
+
+        public static boolean checkNullOrEmpty(Instant instant) {
+            return instant == null;
         }
 
         public static boolean checkNullOrEmpty(UUID value) {

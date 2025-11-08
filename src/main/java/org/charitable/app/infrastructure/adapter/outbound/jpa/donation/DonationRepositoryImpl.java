@@ -5,10 +5,7 @@ import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.charitable.app.domain.common.pagination.Page;
 import org.charitable.app.domain.common.pagination.Pagination;
@@ -18,6 +15,8 @@ import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.donation.DonationRepository;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.mapper.auth.AuthMapper;
 import org.charitable.app.infrastructure.mapper.donation.DonationMapper;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
@@ -78,9 +77,13 @@ class DonationRepositoryImpl implements DonationRepository {
         CriteriaQuery<DonationEntity> cq = cb.createQuery(DonationEntity.class);
         Root<DonationEntity> donation = cq.from(DonationEntity.class);
 
+        // --- Joins ---
+        Join<DonationEntity, AuthEntity> donorJoin = donation.join("donor", JoinType.LEFT);
+        Join<DonationEntity, OrganizationEntity> organizationJoin = donation.join("organization", JoinType.LEFT);
+
+        // --- Predicates ---
         List<Predicate> predicates = new ArrayList<>();
 
-        // --- Search filter ---
         if (filter.getSearch() != null && !filter.getSearch().isEmpty()) {
             String pattern = "%" + filter.getSearch().toLowerCase() + "%";
             predicates.add(cb.or(
@@ -89,26 +92,22 @@ class DonationRepositoryImpl implements DonationRepository {
             ));
         }
 
-        // --- DonationType filter ---
         if (filter.getType() != null) {
             predicates.add(cb.equal(donation.get("type"), filter.getType()));
         }
 
-        // --- DonationStatus filter ---
         if (filter.getStatus() != null) {
             predicates.add(cb.equal(donation.get("status"), filter.getStatus()));
         }
 
-        // --- Optional: filter by organization/donor if needed ---
-        // e.g., donations by this user
         if (user != null && user.getUserId() != null) {
-            predicates.add(cb.equal(donation.get("donor").get("id"), user.getId()));
+            predicates.add(cb.equal(donorJoin.get("id"), user.getId()));
+            predicates.add(cb.equal(organizationJoin.get("id"), user.getUserId()));
+        } else {
+            predicates.add(cb.isNull(organizationJoin.get("id")));
         }
 
-        // Apply predicates
         cq.where(predicates.toArray(new Predicate[0]));
-
-        // Optional: order by created date
         cq.orderBy(cb.desc(donation.get("createdAt")));
 
         // --- Pagination ---
@@ -121,15 +120,42 @@ class DonationRepositoryImpl implements DonationRepository {
                 .setMaxResults(limit)
                 .getResultList();
 
-        // --- Count total items for Page object ---
+        // --- Count query ---
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<DonationEntity> countRoot = countQuery.from(DonationEntity.class);
-        countQuery.select(cb.count(countRoot));
-        countQuery.where(predicates.toArray(new Predicate[0]));
+        Join<DonationEntity, AuthEntity> countDonorJoin = countRoot.join("donor", JoinType.LEFT);
+        Join<DonationEntity, OrganizationEntity> countOrgJoin = countRoot.join("organization", JoinType.LEFT);
+
+        List<Predicate> countPredicates = new ArrayList<>();
+
+        if (filter.getSearch() != null && !filter.getSearch().isEmpty()) {
+            String pattern = "%" + filter.getSearch().toLowerCase() + "%";
+            countPredicates.add(cb.or(
+                    cb.like(cb.lower(countRoot.get("title")), pattern),
+                    cb.like(cb.lower(countRoot.get("description")), pattern)
+            ));
+        }
+
+        if (filter.getType() != null) {
+            countPredicates.add(cb.equal(countRoot.get("type"), filter.getType()));
+        }
+
+        if (filter.getStatus() != null) {
+            countPredicates.add(cb.equal(countRoot.get("status"), filter.getStatus()));
+        }
+
+        if (user != null && user.getUserId() != null) {
+            countPredicates.add(cb.equal(countDonorJoin.get("id"), user.getId()));
+            countPredicates.add(cb.equal(countOrgJoin.get("id"), user.getUserId()));
+        } else {
+            countPredicates.add(cb.isNull(countOrgJoin.get("id")));
+        }
+
+        countQuery.select(cb.count(countRoot))
+                .where(countPredicates.toArray(new Predicate[0]));
 
         int total = entityManager.createQuery(countQuery).getSingleResult().intValue();
         int totalPages = (int) Math.ceil((double) total / limit);
-
 
         List<Donation> donations = resultList.stream()
                 .map(DonationMapper::mapToDomain)
@@ -142,7 +168,7 @@ class DonationRepositoryImpl implements DonationRepository {
                 .totalPages(totalPages)
                 .build();
 
-        return new Page<Donation>(donations, pagination);
+        return new Page<>(donations, pagination);
     }
 
     @Transactional

@@ -25,7 +25,7 @@ public class DonateRequestDTO {
 
     // Optional field, but if present, must match URL format
     @Pattern(
-            regexp = "^(https?://)?([\\w.-]+)(:[0-9]+)?(/.*)?$",
+            regexp = "|https?://[\\w.-]+(:[0-9]+)?(/.*)?",
             message = "Invalid URL format"
     )
     private String url;

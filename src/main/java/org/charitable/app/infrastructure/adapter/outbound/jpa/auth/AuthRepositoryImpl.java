@@ -122,20 +122,33 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     public static Auth mapToDomain(AuthEntity entity) {
-        var auth =  new Auth(
-                entity.getEmail(),
-                entity.getPassword(),
-                entity.getPhoneNumber(),
-                entity.getRole(),
-                entity.getIsEmailVerified(),
-                entity.getStatus(),
-                null,
-                null,
-                null
-        );
-        auth.setId(entity.getId());
-        auth.setCreatedAt(entity.getCreatedAt());
-        auth.setUpdatedAt(entity.getUpdatedAt());
+//        var auth =  new Auth(
+//                entity.getEmail(),
+//                entity.getPassword(),
+//                entity.getPhoneNumber(),
+//                entity.getRole(),
+//                entity.getIsEmailVerified(),
+//                entity.getStatus(),
+//                null,
+//                null,
+//                null
+//        );
+//
+//        auth.setId(entity.getId());
+//        auth.setCreatedAt(entity.getCreatedAt());
+//        auth.setUpdatedAt(entity.getUpdatedAt());
+
+        var auth = Auth.builder()
+                .id(entity.getId())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .email(entity.getEmail())
+                .password(entity.getPassword())
+                .phone(entity.getPhoneNumber())
+                .role(entity.getRole())
+                .isEmailVerified(entity.getIsEmailVerified())
+                .status(entity.getStatus())
+                .build();
         return auth;
     }
 }

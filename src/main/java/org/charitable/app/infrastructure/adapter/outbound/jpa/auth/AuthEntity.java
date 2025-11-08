@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.admin.AdminEntity;
-import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.authStatusHistory.AuthStatusHistory;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.authStatusHistory.AuthStatusHistoryEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
@@ -55,7 +55,7 @@ public class AuthEntity extends BaseEntity {
     private AuthStatus status = AuthStatus.ACTIVE;
 
     @OneToMany(mappedBy = "auth", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AuthStatusHistory> authStatusHistories = new ArrayList<>();
+    private List<AuthStatusHistoryEntity> authStatusHistories = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "organization_id", nullable = true)

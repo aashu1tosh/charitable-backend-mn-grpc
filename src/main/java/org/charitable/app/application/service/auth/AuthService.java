@@ -20,6 +20,7 @@ import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
+import org.charitable.app.domain.port.outbound.auth.authStatusHistory.AuthStatusHistoryRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ class AuthService implements AuthUseCase {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final AuthRepository authRepository;
+    private final AuthStatusHistoryRepository authStatusHistoryRepository;
     private final PasswordHash passwordHash;
     private final OrganizationUseCase organizationService;
     private final UserUseCase userService;
@@ -43,13 +45,15 @@ class AuthService implements AuthUseCase {
             OrganizationUseCase organizationService,
             UserUseCase userService,
             AdminUseCase adminService,
-            AuthTokenManager tokenService) {
+            AuthTokenManager tokenService,
+            AuthStatusHistoryRepository authStatusHistoryRepository) {
         this.authRepository = authRepository;
         this.passwordHash = passwordHash;
         this.organizationService = organizationService;
         this.userService = userService;
         this.tokenService = tokenService;
         this.adminService = adminService;
+        this.authStatusHistoryRepository = authStatusHistoryRepository;
     }
 
     public IdentityTokens login(LoginRequestDTO data) {
@@ -92,6 +96,7 @@ class AuthService implements AuthUseCase {
                 .build();
 
         var newAuth = authRepository.save(auth);
+        authStatusHistoryRepository.save(newAuth, data.getStatus());
 
         logger.info("Registered new organization with ID: {}", newAuth.getId());
 
@@ -118,6 +123,7 @@ class AuthService implements AuthUseCase {
                 .build();
 
         authRepository.save(auth);
+        authStatusHistoryRepository.save(auth, data.getStatus());
         return "Registration successful";
     }
 
@@ -133,17 +139,27 @@ class AuthService implements AuthUseCase {
         var savedUser = userService.register(user);
         String hashedPassword = passwordHash.hash(data.getPassword());
 
-        var auth = new Auth(
-                data.getEmail(),
-                hashedPassword,
-                data.getPhone(),
-                data.getRole(),
-                false,
-                data.getStatus(),
-                null,
-                savedUser,
-                null
-        );
+//        var auth = new Auth(
+//                data.getEmail(),
+//                hashedPassword,
+//                data.getPhone(),
+//                data.getRole(),
+//                false,
+//                data.getStatus(),
+//                null,
+//                null,
+//                savedUser,
+//                null
+//        );
+        var auth = Auth.builder()
+                .email(data.getEmail())
+                .password(hashedPassword)
+                .phone(data.getPhone())
+                .role(data.getRole())
+                .isEmailVerified(false)
+                .status(data.getStatus())
+                .user(savedUser)
+                .build();
         var newAuth = authRepository.save(auth);
 
         logger.info("Registered new user with ID: {}", newAuth.getId());
@@ -165,8 +181,8 @@ class AuthService implements AuthUseCase {
             throw AppException.badRequest("You are not authorized for this process");
         }
 
-        authRepository.updateAuthStatus(data.getId(), data.getAuthStatus());
-        authS
+        var updatedAuth = authRepository.updateAuthStatus(data.getId(), data.getAuthStatus());
+        authStatusHistoryRepository.save(updatedAuth, data.getAuthStatus());
         return "Update Successful";
     }
 

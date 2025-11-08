@@ -1,5 +1,7 @@
 package org.charitable.app.infrastructure.mapper.auth;
 
+import lombok.extern.slf4j.Slf4j;
+import org.charitable.app.common.utils.PrintUtils;
 import org.charitable.app.common.utils.ValueUtils;
 import org.charitable.app.domain.entity.admin.Admin;
 import org.charitable.app.domain.entity.auth.Auth;
@@ -9,13 +11,20 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
 import org.charitable.app.infrastructure.mapper.admin.AdminMapper;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 import org.charitable.app.infrastructure.mapper.user.UserMapper;
+import org.hibernate.Hibernate;
 
+@Slf4j
 public class AuthMapper {
 
     public static Auth mapToDomain(AuthEntity authEntity) {
         if (authEntity == null) {
             return null;
         }
+
+        if (!Hibernate.isInitialized(authEntity)) {
+            return null;
+        }
+        log.info("See what the entity is {}", PrintUtils.prettyPrint(authEntity));
 
         Organization orgDomain = authEntity.getOrganization() != null
                 ? OrganizationMapper.mapToDomain(authEntity.getOrganization())

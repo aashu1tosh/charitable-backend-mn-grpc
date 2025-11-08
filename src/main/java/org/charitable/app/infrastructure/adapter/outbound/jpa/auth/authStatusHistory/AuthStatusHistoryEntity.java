@@ -2,8 +2,11 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.auth.authStatusHi
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
@@ -12,7 +15,9 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 @Table(name = "auth_status_history")
 @Getter
 @Setter
-public class AuthStatusHistory extends BaseEntity {
+@SuperBuilder
+@NoArgsConstructor
+public class AuthStatusHistoryEntity extends BaseEntity {
 
     @Column(name = "status", nullable = false)
     @NotNull

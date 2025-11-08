@@ -5,10 +5,15 @@ import org.charitable.app.common.utils.ValueUtils;
 import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.mapper.auth.AuthMapper;
+import org.hibernate.Hibernate;
 
 public class OrganizationMapper {
     public static Organization mapToDomain(OrganizationEntity entity) {
         if (entity == null) return null;
+
+        if (!Hibernate.isInitialized(entity)) {
+            return null;
+        }
 
         return getOrganization(entity);
     }

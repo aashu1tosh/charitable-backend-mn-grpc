@@ -12,7 +12,10 @@ import org.charitable.app.proto.GotDonationRequest;
 
 public interface DonationUseCase {
     Donation donate(DonateRequestDTO data, TokenPayload user);
+
     Page<Donation> getDonation(GetDonationFilterDTO data, TokenPayload user);
+//    Page<Donation> getMyDonation(GetDonationFilterDTO data, TokenPayload user);
     Donation claimDonation(ClaimDonationRequestDTO data, TokenPayload user);
     Donation gotDonation(GotDonationRequestDTO data, TokenPayload user);
+
 }

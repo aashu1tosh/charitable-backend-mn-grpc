@@ -12,10 +12,12 @@ public class DonationMapper {
             return null;
         }
         return DonationItems.newBuilder()
-                .setId(!ValueUtils.checkNullOrEmpty(UUIDUtils.uuidToString(domain.getId())) ? UUIDUtils.uuidToString(domain.getId()) : null)
+                .setId(!ValueUtils.checkNullOrEmpty(UUIDUtils.uuidToString(domain.getId())) ? UUIDUtils.uuidToString(domain.getId()) : "")
+                .setCreatedAt(!ValueUtils.checkNullOrEmpty(domain.getCreatedAt()) ? domain.getCreatedAt().toString() : "")
+                .setUpdatedAt(!ValueUtils.checkNullOrEmpty(domain.getUpdatedAt()) ? domain.getUpdatedAt().toString() : "")
                 .setTitle(!ValueUtils.checkNullOrEmpty(domain.getTitle()) ? domain.getTitle() : "")
                 .setDescription(!ValueUtils.checkNullOrEmpty(domain.getDescription()) ? domain.getDescription(): "")
-                .setUrl(!ValueUtils.checkNullOrEmpty(domain.getUrl()) ? domain.getUrl() : null)
+                .setUrl(!ValueUtils.checkNullOrEmpty(domain.getUrl()) ? domain.getUrl() : "")
                 .setType(DonationTypeMapper.toProto(domain.getType()))
                 .setStatus(DonationStatusMapper.toProto(domain.getStatus()))
                 .build();

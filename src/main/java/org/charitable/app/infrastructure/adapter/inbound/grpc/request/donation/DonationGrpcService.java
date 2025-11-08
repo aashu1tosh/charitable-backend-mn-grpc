@@ -6,6 +6,7 @@ import org.charitable.app.application.dto.request.donation.ClaimDonationRequestD
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
 import org.charitable.app.application.dto.request.donation.GetDonationFilterDTO;
 import org.charitable.app.application.dto.request.donation.GotDonationRequestDTO;
+import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
 import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
@@ -57,6 +58,21 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
         responseObserver.onCompleted();
     }
 
+    @Override
+    @GrpcAuthenticate(roles = {Role.USER})
+    public void getMyDonations(GetDonationRequest request, StreamObserver<GetDonationResponse> responseObserver) {
+//        var filter = GetDonationFilterDTO.builder()
+//                .limit(request.getLimit())
+//                .page(request.getPage())
+//                .search(request.getSearch())
+//                .type(DonationTypeMapper.fromProto(request.getType(), false))
+//                .status(DonationStatusMapper.fromProto(request.getStatus(), false))
+//                .build();
+//
+//        validator.validate(filter);
+
+        throw AppException.internal("Method not allowed");
+    }
     @Override
     @GrpcAuthenticate
     public void getDonations(GetDonationRequest request, StreamObserver<GetDonationResponse> responseObserver) {

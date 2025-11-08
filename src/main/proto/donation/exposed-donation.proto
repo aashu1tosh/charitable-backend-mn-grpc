@@ -8,6 +8,7 @@ import "exposed-common.proto";
 
 service DonationService {
   rpc Donate(UserDonationRequest) returns (CommonResponse);
+  rpc GetMyDonations(GetDonationRequest) returns (GetDonationResponse);
   rpc GetDonations(GetDonationRequest) returns (GetDonationResponse);
 
   rpc ClaimDonation(ClaimDonationRequest) returns (CommonResponse);

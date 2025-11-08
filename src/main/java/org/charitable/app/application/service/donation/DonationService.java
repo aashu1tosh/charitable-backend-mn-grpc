@@ -59,8 +59,15 @@ public class DonationService implements DonationUseCase {
                 .type(request.getType())
                 .build();
 
-        return donationRepo.getDonations(filter, user);
+        var resp = donationRepo.getDonations(filter, user);
+        logger.info("Get Donation Response: {}", resp);
+        return resp;
     }
+
+//    @Override
+//    public Page<Donation> getMyDonation(GetDonationFilterDTO request, TokenPayload user) {
+//        var filter = DonationFilter.builder()
+//    }
 
     @Override
     public Donation claimDonation(ClaimDonationRequestDTO request, TokenPayload user) {
