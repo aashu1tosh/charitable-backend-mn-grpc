@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.charitable.app.proto";
+option java_outer_classname = "DonationProto";
+
+import "exposed-common.proto";
+
+service DonationService {
+  rpc Donate(UserDonationRequest) returns (CommonResponse);
+  rpc GetMyDonations(GetDonationRequest) returns (GetDonationResponse);
+  rpc GetDonations(GetDonationRequest) returns (GetDonationResponse);
+
+  rpc ClaimDonation(ClaimDonationRequest) returns (CommonResponse);
+  rpc GotDonation(GotDonationRequest) returns (CommonResponse);
+}
+
+message UserDonationRequest {
+  string title = 1;
+  string description = 2;
+  DonationType type = 3;
+  string product_url = 4;
+}
+
+message GetDonationRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string search = 3;
+  DonationType type = 4;
+  DonationStatus status = 5;
+}
+
+message DonationItems {
+  string id = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+  string title = 1;
+  string description = 2;
+  string url = 3;
+  DonationType type = 4;
+  DonationStatus status = 5;
+}
+
+message PageDonation {
+  repeated DonationItems data = 1;
+  Pagination pagination = 2;
+}
+
+message GetDonationResponse {
+  bool success = 1;
+  string message = 2;
+  PageDonation data = 3;
+}
+
+message ClaimDonationRequest {
+  string donationId = 1;
+}
+
+message GotDonationRequest {
+  string donationId = 1;
+}

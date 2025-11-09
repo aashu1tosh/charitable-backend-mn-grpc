@@ -7,17 +7,52 @@ option java_outer_classname = "AuthProto";
 import "exposed-common.proto";
 
 service AuthService {
-  rpc Login (LoginRequest) returns (CommonResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
   rpc RegisterUser (RegisterUserRequest) returns (CommonResponse);
   rpc RegisterOrganization (RegisterOrganizationRequest) returns (CommonResponse);
+  rpc RegisterAdmin(RegisterAdminRequest) returns (CommonResponse);
 
-  rpc MyInfo(EmptyRequest) returns (CommonResponse);
+  rpc UpdateAuthStatus(UpdateAuthStatusRequest) returns (CommonResponse);
+
+  rpc MyInfo(EmptyRequest) returns (MyInfoResponse);
   rpc Logout (LogoutRequest) returns (CommonResponse);
+}
+
+message RegisterAdminRequest {
+  string email = 1;
+  string password = 2;
+  string phone_number = 3;
+
+  string firstName = 4;
+  string middleName = 5;
+  string lastName = 6;
 }
 
 message LoginRequest {
   string username = 1;
   string password = 2;
+}
+
+message AuthTokenResponse {
+  string accessToken = 1;
+  string refreshToken =2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  AuthTokenResponse data =3;
+}
+
+message RefreshTokenRequest {
+  string refreshToken = 1;
+}
+
+message RefreshTokenResponse {
+  bool success = 1;
+  string message = 2;
+  AuthTokenResponse data =3;
 }
 
 
@@ -39,6 +74,12 @@ message RegisterOrganizationRequest {
   string phone_number = 2;
 
   string organization_name = 1;
+
+  string organizationHeadFirstName = 10;
+  string organizationHeadMiddleName = 11;
+  string organizationHeadLastName = 12;
+  string organizationHeadPhoneNumber = 13;
+
   string address = 5;
   float latitude = 6;
   float longitude = 7;
@@ -48,3 +89,23 @@ message RegisterOrganizationRequest {
 
 
 message LogoutRequest {}
+
+message UpdateAuthStatusRequest {
+  string auth_id = 1;
+  AuthStatus status = 2;
+}
+
+message MyInfoData {
+  string email = 1;
+  string phone = 2;
+  Role role = 3;
+  AuthStatus status = 4;
+  Organization organization = 5;
+  User user = 6;
+}
+
+message MyInfoResponse {
+  bool success = 1;
+  string message = 2;
+  MyInfoData data = 3;
+}

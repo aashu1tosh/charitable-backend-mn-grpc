@@ -3,6 +3,7 @@ package org.charitable.app.infrastructure.mapper.user;
 import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
 import org.charitable.app.infrastructure.mapper.auth.AuthMapper;
+import org.hibernate.Hibernate;
 
 public class UserMapper {
 
@@ -31,6 +32,13 @@ public class UserMapper {
     }
 
     private static User getUser(UserEntity userEntity) {
+        if(userEntity == null) return null;
+
+        // Only map if the entity is initialized
+        if (!Hibernate.isInitialized(userEntity)) {
+            return null;
+        }
+
         var user = new User(
                 userEntity.getFirstName(),
                 userEntity.getMiddleName(),

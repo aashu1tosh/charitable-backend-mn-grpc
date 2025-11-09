@@ -1,10 +1,19 @@
 package org.charitable.app.infrastructure.mapper.auth;
 
+import lombok.extern.slf4j.Slf4j;
+import org.charitable.app.common.utils.PrintUtils;
+import org.charitable.app.common.utils.ValueUtils;
+import org.charitable.app.domain.entity.admin.Admin;
 import org.charitable.app.domain.entity.auth.Auth;
+import org.charitable.app.domain.entity.organization.Organization;
+import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
+import org.charitable.app.infrastructure.mapper.admin.AdminMapper;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 import org.charitable.app.infrastructure.mapper.user.UserMapper;
+import org.hibernate.Hibernate;
 
+@Slf4j
 public class AuthMapper {
 
     public static Auth mapToDomain(AuthEntity authEntity) {
@@ -12,45 +21,55 @@ public class AuthMapper {
             return null;
         }
 
-        return getAuth(authEntity);
+        if (!Hibernate.isInitialized(authEntity)) {
+            return null;
+        }
+        log.info("See what the entity is {}", PrintUtils.prettyPrint(authEntity));
+
+        Organization orgDomain = authEntity.getOrganization() != null
+                ? OrganizationMapper.mapToDomain(authEntity.getOrganization())
+                : null;
+
+        Admin adminDomain = authEntity.getAdmin() != null
+                ? AdminMapper.mapToDomain(authEntity.getAdmin())
+                : null;
+
+        User userDomain = authEntity.getUser() != null
+                ? UserMapper.mapToDomain(authEntity.getUser())
+                : null;
+
+        return Auth.builder()
+                .id(authEntity.getId())
+                .createdAt(authEntity.getCreatedAt())
+                .updatedAt(authEntity.getUpdatedAt())
+                .email(authEntity.getEmail())
+                .phone(authEntity.getPhoneNumber())
+                .role(authEntity.getRole())
+                .isEmailVerified(authEntity.getIsEmailVerified())
+                .status(authEntity.getStatus())
+                .organization(orgDomain)
+                .admin(adminDomain)
+                .user(userDomain)
+                .build();
     }
 
-    public static AuthEntity mapToEntity(Auth auth) {
-        if (auth == null) {
+    public static AuthEntity mapToEntity(Auth domain) {
+        if (domain == null) {
             return null;
         }
 
-        var entity = new AuthEntity(
-                auth.getEmail(),
-                null,
-                auth.getPhone(),
-                auth.getRole(),
-                auth.getIsEmailVerified(),
-                auth.getStatus(),
-                OrganizationMapper.mapToEntitySafe(auth.getOrganization()),
-                null
-        );
-        entity.setId(auth.getId());
-        entity.setCreatedAt(auth.getCreatedAt());
-        entity.setUpdatedAt(auth.getUpdatedAt());
-        return entity;
-    }
-
-
-    private static Auth getAuth(AuthEntity authEntity) {
-        var auth = new Auth(
-                authEntity.getEmail(),
-                null,
-                authEntity.getPhoneNumber(),
-                authEntity.getRole(),
-                authEntity.getIsEmailVerified(),
-                authEntity.getStatus(),
-                OrganizationMapper.mapToDomain(authEntity.getOrganization()),
-                UserMapper.mapToDomain(authEntity.getUser())
-        );
-        auth.setId(authEntity.getId());
-        auth.setCreatedAt(authEntity.getCreatedAt());
-        auth.setUpdatedAt(authEntity.getUpdatedAt());
-        return auth;
+        return AuthEntity.builder()
+                .id(!ValueUtils.checkNullOrEmpty(domain.getId()) ? domain.getId() : null)
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
+                .email(domain.getEmail())
+                .role(domain.getRole())
+                .isEmailVerified(domain.getIsEmailVerified())
+                .status(domain.getStatus())
+                .phoneNumber(domain.getPhone())
+                .organization(domain.getOrganization() != null ? OrganizationMapper.mapToEntitySafe(domain.getOrganization()) : null)
+                .user(domain.getUser() != null ? UserMapper.mapToSafeEntity(domain.getUser()) : null)
+                .admin(domain.getAdmin() != null ? AdminMapper.mapToSafeEntity(domain.getAdmin()) : null)
+                .build();
     }
 }

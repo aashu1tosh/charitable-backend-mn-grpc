@@ -35,7 +35,7 @@ public class GlobalGrpcExceptionInterceptor implements ServerInterceptor {
                 try {
                     super.onHalfClose();
                 } catch (AppException appEx) {
-                    logger.warn("AppException caught in gRPC call: {}", appEx.getMessage());
+                    logger.error("AppException caught in gRPC call. ",appEx);
                     call.close(GrpcExceptionMapper.toGrpc(appEx).getStatus(), new Metadata());
                 }
                 catch (ConstraintViolationException cve) {

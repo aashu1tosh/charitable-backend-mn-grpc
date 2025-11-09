@@ -1,8 +1,10 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
 
+import io.micronaut.data.annotation.Query;
 import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.jpa.repository.JpaRepository;
+import org.charitable.app.domain.model.auth.AuthStatus;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,4 +12,20 @@ import java.util.UUID;
 @Repository
 public interface AuthJpaRepository extends JpaRepository<AuthEntity, UUID> {
     Optional<AuthEntity> findByEmail(String email);
+
+    @Query("""
+    SELECT a FROM AuthEntity a
+    LEFT JOIN FETCH a.organization
+    LEFT JOIN FETCH a.user
+    LEFT JOIN FETCH a.admin
+    WHERE a.id = :id
+""")
+    Optional<AuthEntity> findByIdWithRelations(UUID id);
+
+    @Query("""
+    UPDATE AuthEntity a SET
+        a.status = :status
+    WHERE a.id = :id
+""")
+    Optional<AuthEntity> updateAuthStatus(UUID id, AuthStatus status);
 }

@@ -6,6 +6,6 @@ import io.micronaut.data.repository.CrudRepository;
 import java.util.UUID;
 
 @Repository
-public interface AdminRepository extends CrudRepository<AdminEntity, UUID> {
+public interface AdminJpaRepository extends CrudRepository<AdminEntity, UUID> {
 
 }

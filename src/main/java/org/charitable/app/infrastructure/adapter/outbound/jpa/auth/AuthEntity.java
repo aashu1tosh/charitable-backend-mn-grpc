@@ -1,22 +1,27 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
-import io.micronaut.data.annotation.MappedEntity;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.admin.AdminEntity;
+import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.authStatusHistory.AuthStatusHistoryEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "auth")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthEntity extends BaseEntity {
@@ -49,6 +54,9 @@ public class AuthEntity extends BaseEntity {
     @Builder.Default
     private AuthStatus status = AuthStatus.ACTIVE;
 
+    @OneToMany(mappedBy = "auth", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AuthStatusHistoryEntity> authStatusHistories = new ArrayList<>();
+
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "organization_id", nullable = true)
     private OrganizationEntity organization;
@@ -56,4 +64,8 @@ public class AuthEntity extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "user_id", nullable = true)
     private UserEntity user;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "admin_id", nullable = true)
+    private AdminEntity admin;
 }

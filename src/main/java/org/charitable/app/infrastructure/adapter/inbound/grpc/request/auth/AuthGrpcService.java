@@ -3,12 +3,16 @@ package org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth;
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
+import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
+import org.charitable.app.application.dto.request.auth.UpdateAuthStatusDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
+import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
+import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.context.GrpcContextKeys;
@@ -31,11 +35,8 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
     }
 
     @Override
-    public void login(LoginRequest request, StreamObserver<CommonResponse> responseObserver) {
-        try {
+    public void login(LoginRequest request, StreamObserver<LoginResponse> responseObserver) {
             logger.info("Received login request for user: {}", request.getUsername());
-            String username = request.getUsername();
-            String password = request.getPassword();
 
             var dto = new LoginRequestDTO(request.getUsername(), request.getPassword());
 
@@ -43,24 +44,39 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 
             var result = authUseCase.login(dto);
 
-            var response = CommonResponse.newBuilder()
-                    .setSuccess(result.isSuccess())
-                    .setMessage(result.getMessage())
+            var responseToken = AuthTokenResponse.newBuilder()
+                    .setAccessToken(result.getAccessToken())
+                    .setRefreshToken(result.getRefreshToken())
                     .build();
+
+            var response = LoginResponse.newBuilder()
+                            .setSuccess(true)
+                            .setMessage("Login successful")
+                            .setData(responseToken).build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (Exception e) {
-            var response = CommonResponse.newBuilder()
-                    .setSuccess(false)
-                    .setMessage("An error occurred during login")
-                    .build();
 
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-            logger.error("Logging failed", e);
-        }
 }
+
+    @Override
+    public void refreshToken(RefreshTokenRequest request, StreamObserver<RefreshTokenResponse> responseObserver) {
+
+        var result = authUseCase.refreshToken(request.getRefreshToken());
+
+        var responseToken = AuthTokenResponse.newBuilder()
+                .setAccessToken(result.getAccessToken())
+                .setRefreshToken(result.getRefreshToken())
+                .build();
+        var response = RefreshTokenResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Token refresh successfully")
+                .setData(responseToken)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 
     @Override
     public void registerUser(RegisterUserRequest request, StreamObserver<CommonResponse> responseObserver) {
@@ -99,7 +115,6 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         responseObserver.onCompleted();
     }
 
-
     @Override
     public void registerOrganization(RegisterOrganizationRequest request, StreamObserver<CommonResponse> responseObserver) {
         logger.info("Received register organization request for organization: {}", request.getOrganizationName());
@@ -112,29 +127,38 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         float latitude = request.getLatitude();
         float longitude = request.getLongitude();
 
-        var auth = new AuthRegisterRequestDTO(
-                email,
-                password,
-                contactNumber,
-                Role.ORGANIZATION,
-                AuthStatus.ACTIVE
-        );
+        var auth = AuthRegisterRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .phone(request.getOrganizationHeadPhoneNumber())
+                .role(Role.ORGANIZATION_SUPER_ADMIN)
+                .status(AuthStatus.ACTIVE)
+                .build();
+
         validator.validate(auth);
 
-        var org = new OrganizationRegisterRequestDTO(
-                organizationName,
-                address,
-                latitude,
-                longitude,
-                govtId,
-                contactNumber
-        );
+        var org = OrganizationRegisterRequestDTO.builder()
+                .name(organizationName)
+                .address(address)
+                .latitude(latitude)
+                .longitude(longitude)
+                .govtId(govtId)
+                .contactNumber(contactNumber)
+                .build();
 
-        var resp = authUseCase.registerOrganization(auth, org);
+        var admin =  AdminRegisterRequestDTO.builder()
+                .firstName(request.getOrganizationHeadFirstName())
+                .middleName(request.getOrganizationHeadMiddleName())
+                .lastName(request.getOrganizationHeadLastName())
+                .build();
+
+        validator.validate(admin);
+
+        var resp = authUseCase.registerOrganization(auth, org, admin);
 
         CommonResponse response = CommonResponse.newBuilder()
-                .setSuccess(resp.isSuccess())
-                .setMessage(resp.getMessage())
+                .setSuccess(true)
+                .setMessage(resp)
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -142,7 +166,47 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
 
     @Override
     @GrpcAuthenticate(roles = {Role.SUDO_ADMIN})
-    public void myInfo(EmptyRequest request, StreamObserver<CommonResponse> responseObserver) {
+    public void registerAdmin(RegisterAdminRequest request, StreamObserver<CommonResponse> responseObserver) {
+        logger.info("Admin register request received.");
+        String password = request.getPassword();
+        String email = request.getEmail();
+        String phone = request.getPhoneNumber();
+
+        String firstName = request.getFirstName();
+        String middleName = request.getMiddleName();
+        String lastName = request.getLastName();
+
+        var auth = AuthRegisterRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .phone(phone)
+                .role(Role.ADMIN)
+                .status(AuthStatus.ACTIVE)
+                .build();
+
+        validator.validate(auth);
+
+        var admin = AdminRegisterRequestDTO.builder()
+                .firstName(firstName)
+                .middleName(middleName)
+                .lastName(lastName)
+                .build();
+
+        validator.validate(admin);
+
+        var rsp = authUseCase.registerAdmin(auth, admin);
+
+        CommonResponse response = CommonResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage(rsp)
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @GrpcAuthenticate()
+    public void myInfo(EmptyRequest request, StreamObserver<MyInfoResponse> responseObserver) {
 
         logger.info("Receive my info request");
         var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
@@ -150,9 +214,82 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         var resp = authUseCase.myInfo(tokenPayload.getId());
 
         logger.info("Receive my info response: {}", resp);
+
+        Organization orgData = null;
+        if (resp.getOrganization() != null && resp.getId() != null) {
+            var org = resp.getOrganization();
+            orgData = Organization.newBuilder()
+                    .setName(org.getName())
+                    .setAddress(org.getAddress())
+                    .setLatitude(org.getLatitude())
+                    .setLongitude(org.getLongitude())
+                    .setGovtId(org.getGovtId())
+                    .setContactNumber(org.getContactNumber())
+                    .build();
+        }
+
+        org.charitable.app.proto.User user = null;
+        if (resp.getUser() != null && resp.getId() != null) {
+            logger.info("Receive my info user {}", resp.getUser().getId());
+            var usr = resp.getUser();
+            user = User.newBuilder()
+                    .setFirstName(usr.getFirstName())
+                    .setMiddleName(usr.getMiddleName())
+                    .setLastName(usr.getLastName())
+                    .setLatitude(usr.getLatitude())
+                    .setLongitude(usr.getLongitude())
+                    .build();
+        }
+
+        MyInfoData.Builder infoBuilder = MyInfoData.newBuilder()
+                .setEmail(resp.getEmail())
+                .setPhone(resp.getPhone())
+                .setRole(
+                        resp.getRole() != null
+                                ? org.charitable.app.proto.Role.valueOf(resp.getRole().name())
+                                : org.charitable.app.proto.Role.ROLE_UNSPECIFIED
+                )
+                .setStatus(
+                        resp.getStatus() != null
+                                ? org.charitable.app.proto.AuthStatus.valueOf(resp.getStatus().name())
+                                : org.charitable.app.proto.AuthStatus.STATUS_UNSPECIFIED
+                );
+
+        if (orgData != null) {
+            infoBuilder.setOrganization(orgData);
+        }
+
+        if(user != null) {
+            infoBuilder.setUser(user);
+        }
+
+        MyInfoData infoData = infoBuilder.build();
+
+        MyInfoResponse response = MyInfoResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Data fetch successfully")
+                .setData(infoData)
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @GrpcAuthenticate(roles = {Role.ADMIN, Role.SUDO_ADMIN})
+    public void updateAuthStatus(UpdateAuthStatusRequest request, StreamObserver<CommonResponse> responseObserver) {
+        logger.info("Update auth status request received.");
+        var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
+        var data = UpdateAuthStatusDTO.builder()
+                .id(UUIDUtils.stringToUUID(request.getAuthId()))
+                .authStatus(org.charitable.app.infrastructure.grpc.mapper.AuthStatusMapper.fromProto(request.getStatus()))
+                .build();
+
+        validator.validate(data);
+        var resp = authUseCase.updateAuthStatus(data, tokenPayload);
+
         CommonResponse response = CommonResponse.newBuilder()
                 .setSuccess(true)
-                .setMessage("My info retrieved successfully")
+                .setMessage(resp)
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

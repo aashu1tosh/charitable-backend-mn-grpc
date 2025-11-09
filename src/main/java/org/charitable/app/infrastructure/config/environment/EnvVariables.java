@@ -27,9 +27,20 @@ public class EnvVariables {
         return getEnvOrThrow("micronaut.security.token.jwt.generator.access-token.secret");
     }
 
-    public String getJwtRefreshTokenSecret() {
-        return getEnvOrThrow("micronaut.security.token.jwt.generator.access-token.secret");
+    public Long getJwtAccessTokenExpiration() {
+        var exp = getEnvOrThrow("micronaut.security.token.jwt.generator.access-token.expiration");
+        return Long.parseLong(exp);
     }
+
+    public String getJwtRefreshTokenSecret() {
+        return getEnvOrThrow("micronaut.security.token.jwt.generator.refresh-token.secret");
+    }
+
+    public Long getJwtRefreshTokenExpiration() {
+        var exp = getEnvOrThrow("micronaut.security.token.jwt.generator.refresh-token.expiration");
+        return Long.parseLong(exp);
+    }
+
 
     private String getEnvOrThrow(String key) {
         return environment.getProperty(key, String.class).orElseThrow(() -> AppException.internal("Something went wrong. Please try again"));

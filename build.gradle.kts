@@ -1,7 +1,7 @@
 import com.google.protobuf.gradle.*
 plugins {
     id("io.micronaut.application") version "4.5.4"
-    id("com.google.protobuf") version "0.9.2"
+    id("com.google.protobuf") version "0.9.4"
     id("com.gradleup.shadow") version "8.3.7"
     id("io.micronaut.aot") version "4.5.4"
 }

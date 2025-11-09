@@ -10,3 +10,57 @@ message CommonResponse {
   bool success = 1;
   string message = 2;
 }
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  SUDO_ADMIN = 1;
+  ADMIN = 2;
+  USER = 3;
+  ORGANIZATION = 4;
+}
+
+enum AuthStatus {
+  STATUS_UNSPECIFIED = 0;
+  ACTIVE = 1;
+  INACTIVE = 2;
+  SUSPENDED = 3;
+  DELETED = 4;
+}
+
+enum DonationType {
+  DONATION_UNSPECIFIED = 0;
+  BOOKS = 1;
+  CLOTHES = 2;
+}
+
+enum DonationStatus {
+  DONATION_STATUS_UNSPECIFIED = 0;
+  AVAILABLE = 1;
+  CLAIMED = 2;
+  DONATED = 3;
+  CANCELLED = 4;
+}
+
+message Organization {
+  string name = 1;
+  string address = 2;
+  float latitude = 3;
+  float longitude = 4;
+  string govtId = 5;
+  string contactNumber = 6;
+}
+
+message User {
+  string firstName = 1;
+  string middleName = 2;
+  string lastName = 3;
+  float  latitude = 4;
+  float longitude = 5;
+}
+
+message Pagination {
+  int32 page = 1;
+  int32 size = 2;
+  int32 total = 3;
+  int32 totalPages =4;
+}
