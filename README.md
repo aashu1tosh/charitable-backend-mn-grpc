@@ -75,7 +75,7 @@ grpcwebproxy \
   --backend_addr=localhost:50051 \
   --run_tls_server=false \
   --allow_all_origins \
-  --server_http_debug_port=8080
+  --server_http_debug_port=8000
 ```
 
 If not installed install using
