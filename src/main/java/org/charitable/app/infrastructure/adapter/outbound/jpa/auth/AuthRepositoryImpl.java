@@ -73,6 +73,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
          return Auth.builder()
                  .id(entity.getId())
+                 .createdAt(entity.getCreatedAt())
+                 .updatedAt(entity.getUpdatedAt())
                  .email(entity.getEmail())
                  .phone(entity.getPhoneNumber())
                  .status(entity.getStatus())

@@ -16,7 +16,8 @@ enum Role {
   SUDO_ADMIN = 1;
   ADMIN = 2;
   USER = 3;
-  ORGANIZATION = 4;
+  ORGANIZATION_SUPER_ADMIN = 4;
+  ORGANIZATION_ADMIN = 5;
 }
 
 enum AuthStatus {

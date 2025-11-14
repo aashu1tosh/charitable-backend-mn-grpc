@@ -242,6 +242,8 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
         }
 
         MyInfoData.Builder infoBuilder = MyInfoData.newBuilder()
+                .setId(UUIDUtils.uuidToString(resp.getId()))
+                .setCreatedAt(resp.getCreatedAt().toString())
                 .setEmail(resp.getEmail())
                 .setPhone(resp.getPhone())
                 .setRole(
