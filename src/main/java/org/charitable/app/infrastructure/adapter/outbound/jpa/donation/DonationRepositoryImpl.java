@@ -61,6 +61,8 @@ class DonationRepositoryImpl implements DonationRepository {
                 .description(donation.getDescription())
                 .type(donation.getType())
                 .status(donation.getStatus())
+                .latitude(donation.getLatitude())
+                .longitude(donation.getLongitude())
                 .donor(AuthMapper.mapToEntity(donation.getDonor()))
                 .url(donation.getUrl() != null ?  donation.getUrl() : null)
                 .build();

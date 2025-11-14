@@ -23,6 +23,12 @@ public class DonateRequestDTO {
     @NotNull(message = "Donation Type is required")
     private DonationType donationType;
 
+    @NotNull()
+    private float latitude;
+
+    @NotNull()
+    private float longitude;
+
     // Optional field, but if present, must match URL format
     @Pattern(
             regexp = "|https?://[\\w.-]+(:[0-9]+)?(/.*)?",

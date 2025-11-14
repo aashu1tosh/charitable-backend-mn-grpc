@@ -20,6 +20,8 @@ message UserDonationRequest {
   string description = 2;
   DonationType type = 3;
   string product_url = 4;
+  float lat = 5;
+  float long = 6;
 }
 
 message GetDonationRequest {

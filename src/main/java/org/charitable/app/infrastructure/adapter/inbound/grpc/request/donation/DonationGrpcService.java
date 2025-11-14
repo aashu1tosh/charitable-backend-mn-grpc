@@ -41,6 +41,8 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .donationType(DonationTypeMapper.fromProto(request.getType(), true))
+                .latitude(request.getLat())
+                .longitude(request.getLong())
                 .url(request.getProductUrl())
                 .build();
 

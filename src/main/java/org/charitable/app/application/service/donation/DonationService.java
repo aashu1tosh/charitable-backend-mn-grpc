@@ -43,6 +43,8 @@ public class DonationService implements DonationUseCase {
                 .status(DonationStatus.AVAILABLE)
                 .type(req.getDonationType())
                 .donor(authService.findById(user.getId()))
+                .latitude(req.getLatitude())
+                .longitude(req.getLongitude())
                 .url(req.getUrl() != null ?  req.getUrl() : null)
                 .build();
 
