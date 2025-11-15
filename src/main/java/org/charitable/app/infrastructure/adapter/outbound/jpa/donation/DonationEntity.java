@@ -45,10 +45,10 @@ public class DonationEntity extends BaseEntity {
     private List<DonationStatusHistory> donationStatusHistories = new ArrayList<>();
 
     @Column()
-    private float latitude;
+    private Float latitude;
 
     @Column()
-    private float longitude;
+    private Float longitude;
 
     @Column()
     private String url;

@@ -25,11 +25,11 @@ message UserDonationRequest {
 }
 
 message GetDonationRequest {
-  int32 page = 1;
-  int32 limit = 2;
-  string search = 3;
-  DonationType type = 4;
-  DonationStatus status = 5;
+  optional int32 page = 1;
+  optional int32 limit = 2;
+  optional string search = 3;
+  optional DonationType type = 4;
+  optional DonationStatus status = 5;
 }
 
 message DonationItems {

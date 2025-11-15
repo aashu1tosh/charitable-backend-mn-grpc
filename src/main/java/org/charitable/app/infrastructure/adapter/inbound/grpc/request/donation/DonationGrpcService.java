@@ -63,20 +63,49 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
     @Override
     @GrpcAuthenticate(roles = {Role.USER})
     public void getMyDonations(GetDonationRequest request, StreamObserver<GetDonationResponse> responseObserver) {
-//        var filter = GetDonationFilterDTO.builder()
-//                .limit(request.getLimit())
-//                .page(request.getPage())
-//                .search(request.getSearch())
-//                .type(DonationTypeMapper.fromProto(request.getType(), false))
-//                .status(DonationStatusMapper.fromProto(request.getStatus(), false))
-//                .build();
-//
-//        validator.validate(filter);
+        var filter = GetDonationFilterDTO.builder()
+                .limit(request.getLimit())
+                .page(request.getPage())
+                .search(request.getSearch())
+                .type(DonationTypeMapper.fromProto(request.getType(), false))
+                .status(DonationStatusMapper.fromProto(request.getStatus(), false))
+                .build();
+
+        validator.validate(filter);
+
+        var tokenPayload = GrpcContextKeys.TOKEN_PAYLOAD_KEY.get();
+
+        var resp = donationService.getDonation(filter,tokenPayload);
+        var items = resp.getItems();
+
+        logger.info("See what the response is: {}", resp);
+
+        var pagination = PaginationMapper.toProtoPagination(resp.getPagination());
+
+        PageDonation.Builder pageDonationBuilder = PageDonation.newBuilder();
+
+        for (Donation domain : items) {
+            DonationItems donationItem = DonationMapper.toProto(domain);
+            pageDonationBuilder.addData(donationItem);
+        }
+
+        pageDonationBuilder.setPagination(pagination);
+        PageDonation pageDonation = pageDonationBuilder.build();
+
+
+        GetDonationResponse response = GetDonationResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Donated Successfully")
+                .setData(pageDonation)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
 
         throw AppException.internal("Method not allowed");
     }
+
     @Override
-    @GrpcAuthenticate
     public void getDonations(GetDonationRequest request, StreamObserver<GetDonationResponse> responseObserver) {
         var filter = GetDonationFilterDTO.builder()
                 .limit(request.getLimit() > 0 ? request.getLimit() : 10)

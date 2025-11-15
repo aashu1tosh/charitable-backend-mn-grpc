@@ -16,8 +16,8 @@ public class Donation extends Base {
     private String title;
     private String description;
     private String url;
-    private float latitude;
-    private float longitude;
+    private Float latitude;
+    private Float longitude;
     private Auth donor;
     private DonationType type;
     private DonationStatus status;
