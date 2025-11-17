@@ -46,6 +46,8 @@ public class AuthMapper {
                 .phone(authEntity.getPhoneNumber())
                 .role(authEntity.getRole())
                 .isEmailVerified(authEntity.getIsEmailVerified())
+                .emailVerificationPublishAt(authEntity.getEmailVerificationPublishAt())
+                .emailVerificationToken(authEntity.getEmailVerificationToken())
                 .status(authEntity.getStatus())
                 .organization(orgDomain)
                 .admin(adminDomain)

@@ -14,6 +14,7 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,12 @@ public class AuthEntity extends BaseEntity {
     @Column(name = "is_email_verified", nullable = false)
     @NotNull
     private Boolean isEmailVerified;
+
+    @Column(name = "email_verification_token", nullable = true, unique = true)
+    private String emailVerificationToken;
+
+    @Column(name = "email_verification_publish_at", nullable = true)
+    private Instant emailVerificationPublishAt;
 
     @Column(name = "status", nullable = false)
     @NotNull

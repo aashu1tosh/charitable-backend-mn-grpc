@@ -2,6 +2,7 @@ package org.charitable.app.application.service.auth;
 
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.charitable.app.application.dto.request.admin.AdminRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.AuthRegisterRequestDTO;
 import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
@@ -15,6 +16,7 @@ import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
 import org.charitable.app.application.port.inbound.user.UserUseCase;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
+import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
 import org.charitable.app.domain.model.Role;
@@ -22,14 +24,14 @@ import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.auth.authStatusHistory.AuthStatusHistoryRepository;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
 
 @Singleton
+@Slf4j
 class AuthService implements AuthUseCase {
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final AuthRepository authRepository;
     private final AuthStatusHistoryRepository authStatusHistoryRepository;
@@ -57,11 +59,11 @@ class AuthService implements AuthUseCase {
     }
 
     public IdentityTokens login(LoginRequestDTO data) {
-        logger.info("Service login for user: {}", data.getUsername());
+        log.info("Service login for user: {}", data.getUsername());
 
         var auth = authRepository.findByEmail(data.getUsername());
 
-        logger.info("Found auth for user: {}", auth);
+        log.info("Found auth for user: {}", auth);
 
         if (auth.isEmpty() || !passwordHash.matches(data.getPassword(), auth.get().getPassword())) {
             throw AppException.badRequest("Invalid credentials");
@@ -72,7 +74,7 @@ class AuthService implements AuthUseCase {
 
     @Transactional
     public String registerOrganization(AuthRegisterRequestDTO data, OrganizationRegisterRequestDTO organization, AdminRegisterRequestDTO admin) {
-        logger.info("Service register organization for user: {}", data.getEmail());
+        log.info("Service register organization for user: {}", data.getEmail());
 
         var existingAuth = authRepository.findByEmail(data.getEmail());
         if (existingAuth.isPresent()) {
@@ -97,8 +99,8 @@ class AuthService implements AuthUseCase {
 
         var newAuth = authRepository.save(auth);
         authStatusHistoryRepository.save(newAuth, data.getStatus());
-
-        logger.info("Registered new organization with ID: {}", newAuth.getId());
+        this.sendEmailVerification(newAuth.getEmail());
+        log.info("Registered new organization with ID: {}", newAuth.getId());
 
         return "Registration successful";
     }
@@ -124,33 +126,27 @@ class AuthService implements AuthUseCase {
 
         authRepository.save(auth);
         authStatusHistoryRepository.save(auth, data.getStatus());
+        this.sendEmailVerification(auth.getEmail());
         return "Registration successful";
     }
 
     @Transactional
     public String registerUser(AuthRegisterRequestDTO data, UserRegisterRequestDTO user) {
-        logger.info("Service register user for email: {}", data.getEmail());
+        log.info("Service register user for email: {}", data.getEmail());
 
         var existingAuth = authRepository.findByEmail(data.getEmail());
         if (existingAuth.isPresent()) {
             throw AppException.badRequest("Email already in use");
         }
 
+        var existingPhoneNumber = authRepository.findByPhone(data.getEmail());
+        if (existingPhoneNumber.isPresent()) {
+            throw AppException.badRequest("Phone number already in use");
+        }
+
         var savedUser = userService.register(user);
         String hashedPassword = passwordHash.hash(data.getPassword());
 
-//        var auth = new Auth(
-//                data.getEmail(),
-//                hashedPassword,
-//                data.getPhone(),
-//                data.getRole(),
-//                false,
-//                data.getStatus(),
-//                null,
-//                null,
-//                savedUser,
-//                null
-//        );
         var auth = Auth.builder()
                 .email(data.getEmail())
                 .password(hashedPassword)
@@ -162,8 +158,8 @@ class AuthService implements AuthUseCase {
                 .build();
         var newAuth = authRepository.save(auth);
 
-        logger.info("Registered new user with ID: {}", newAuth.getId());
-
+        this.sendEmailVerification(newAuth.getEmail());
+        log.info("Registered new user with ID: {}", newAuth.getId());
         return "Registration successful";
     }
 
@@ -187,7 +183,7 @@ class AuthService implements AuthUseCase {
     }
 
     public Auth myInfo(UUID authId) {
-        logger.info("Service myInfo for authId: {}", authId);
+        log.info("Service myInfo for authId: {}", authId);
         return  authRepository.findMyInfo(authId);
     }
 
@@ -206,5 +202,59 @@ class AuthService implements AuthUseCase {
         var auth = authRepository.findById(user.getId()).orElseThrow(() -> AppException.badRequest("Auth not found"));
 
         return tokenService.generateToken(auth);
+    }
+
+    public void sendEmailVerification(String email) {
+        try {
+            var auth = authRepository.findByEmail(email);
+
+            if(auth.isEmpty()) {
+                throw AppException.badRequest("Auth not found");
+            }
+
+            var authData = auth.get();
+            if(authData.getIsEmailVerified()) {
+                throw AppException.badRequest("Email already verified");
+            }
+
+            Instant publishAt = authData.getEmailVerificationPublishAt();
+            if (publishAt != null && Instant.now().isBefore(publishAt.plus(Duration.ofMinutes(30)))) {
+                throw AppException.badRequest(
+                        "Email verification has been sent. Please check inbox as well as spam."
+                );
+            }
+
+            var token = UUIDUtils.randomUUIDString();
+
+            authData.setEmailVerificationPublishAt(Instant.now());
+            authData.setEmailVerificationToken(token);
+
+            var update = authRepository.update(authData);
+            return;
+        } catch (AppException e) {
+            throw e;
+        }
+        catch (Exception ex) {
+            log.error("Sending email verification failed with exception: {}", ex.getMessage());
+            return;
+        }
+    }
+
+    public Auth verifyEmailAddress(String token) {
+        var auth = authRepository.findByEmailVerificationToken(token);
+
+        if(auth.isEmpty()) {
+            throw AppException.badRequest("Invalid email verification token");
+        }
+
+        var authData = auth.get();
+        var publishAt = authData.getEmailVerificationPublishAt();
+
+        if (publishAt != null && Instant.now().isBefore(publishAt.plus(Duration.ofMinutes(30)))) {
+            authData.setIsEmailVerified(true);
+            return authRepository.save(authData);
+        } else {
+            throw AppException.badRequest("Email verification Token has expired");
+        }
     }
 }

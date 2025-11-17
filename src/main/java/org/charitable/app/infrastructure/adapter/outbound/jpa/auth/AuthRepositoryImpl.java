@@ -1,6 +1,7 @@
 package org.charitable.app.infrastructure.adapter.outbound.jpa.auth;
 
 import jakarta.inject.Singleton;
+import jakarta.transaction.Transactional;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.organization.Organization;
@@ -31,9 +32,13 @@ class AuthRepositoryImpl implements AuthRepository {
     @Override
     public Optional<Auth> findByEmail(String email) {
         return jpaRepository.findByEmail(email)
-                .map(entity -> {
-                    return mapToDomain(entity);
-                });
+                .map(AuthMapper::mapToDomain);
+    }
+
+    @Override
+    public Optional<Auth> findByPhone(String email) {
+        return jpaRepository.findByEmail(email)
+                .map(AuthMapper::mapToDomain);
     }
 
     @Override
@@ -111,6 +116,43 @@ class AuthRepositoryImpl implements AuthRepository {
         return mapToDomain(savedEntity);
     }
 
+    @Override
+    @Transactional
+    public Auth update(Auth auth) {
+        AuthEntity existing = jpaRepository.findById(auth.getId())
+                .orElseThrow(() -> new RuntimeException("Auth not found"));
+
+        // Map incoming Auth to entity
+        AuthEntity source = AuthMapper.mapToEntity(auth);
+
+        if (source == null) {
+            throw new RuntimeException("Provided Auth is invalid");
+        }
+
+        // --- Merge fields only if non-null ---
+
+        if (source.getIsEmailVerified() != null) {
+            existing.setIsEmailVerified(source.getIsEmailVerified());
+        }
+
+        if (source.getEmailVerificationToken() != null) {
+            existing.setEmailVerificationToken(source.getEmailVerificationToken());
+        }
+
+        if (source.getEmailVerificationPublishAt() != null) {
+            existing.setEmailVerificationPublishAt(source.getEmailVerificationPublishAt());
+        }
+
+        // Save and return
+        AuthEntity saved = jpaRepository.save(existing);
+        return AuthMapper.mapToDomain(saved);
+    }
+
+    @Override
+    public Optional<Auth> findByEmailVerificationToken(String token) {
+        return jpaRepository.findByEmailVerificationToken(token)
+                .map(AuthMapper::mapToDomain);
+    }
 
     @Override
     public Auth updateAuthStatus(UUID id, AuthStatus status) {

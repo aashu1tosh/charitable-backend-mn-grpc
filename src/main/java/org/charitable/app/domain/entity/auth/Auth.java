@@ -12,6 +12,7 @@ import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.auth.AuthStatus;
 
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -29,4 +30,7 @@ public class Auth extends Base {
     private Organization organization;
     private User user;
     private Admin admin;
+
+    private Instant emailVerificationPublishAt;
+    private String emailVerificationToken;
 }

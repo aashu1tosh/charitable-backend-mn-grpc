@@ -11,7 +11,7 @@ public final class UUIDUtils {
     /**
      * Generate a random UUID as a string.
      */
-    public static String randomUUID() {
+    public static String randomUUIDString() {
         return UUID.randomUUID().toString();
     }
 
