@@ -1,4 +1,4 @@
-package org.charitable.app.domain.port.outbound.auth.authStatusHistory;
+package org.charitable.app.domain.port.outbound.db.auth.authStatusHistory;
 
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.authStatusHistory.AuthStatusHistory;

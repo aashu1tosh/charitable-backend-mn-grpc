@@ -39,6 +39,8 @@ dependencies {
     // for logging with spring implementation
     implementation("org.springframework:spring-jcl:5.3.25")
 
+    implementation("io.micronaut.rabbitmq:micronaut-rabbitmq")
+
     // for cli (like seeding db)
     implementation("io.micronaut.picocli:micronaut-picocli")
 

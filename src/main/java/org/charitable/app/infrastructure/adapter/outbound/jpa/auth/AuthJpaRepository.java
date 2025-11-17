@@ -12,6 +12,9 @@ import java.util.UUID;
 @Repository
 public interface AuthJpaRepository extends JpaRepository<AuthEntity, UUID> {
     Optional<AuthEntity> findByEmail(String email);
+    Optional<AuthEntity> findByEmailVerificationToken(String token);
+
+    Optional<AuthEntity> findByPhoneNumber(String phoneNumber);
 
     @Query("""
     SELECT a FROM AuthEntity a

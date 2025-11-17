@@ -2,7 +2,7 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.organization;
 
 import jakarta.inject.Singleton;
 import org.charitable.app.domain.entity.organization.Organization;
-import org.charitable.app.domain.port.outbound.organization.OrganizationRepository;
+import org.charitable.app.domain.port.outbound.db.organization.OrganizationRepository;
 import org.charitable.app.infrastructure.mapper.organization.OrganizationMapper;
 
 import java.util.Optional;

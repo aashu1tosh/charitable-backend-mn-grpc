@@ -14,7 +14,7 @@ import org.charitable.app.domain.entity.organization.Organization;
 import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
-import org.charitable.app.domain.port.outbound.donation.DonationRepository;
+import org.charitable.app.domain.port.outbound.db.donation.DonationRepository;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.mapper.auth.AuthMapper;

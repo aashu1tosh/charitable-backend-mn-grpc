@@ -6,7 +6,6 @@ import org.charitable.app.application.dto.request.donation.ClaimDonationRequestD
 import org.charitable.app.application.dto.request.donation.DonateRequestDTO;
 import org.charitable.app.application.dto.request.donation.GetDonationFilterDTO;
 import org.charitable.app.application.dto.request.donation.GotDonationRequestDTO;
-import org.charitable.app.application.dto.response.AppResponse;
 import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.donation.DonationUseCase;
@@ -15,9 +14,8 @@ import org.charitable.app.domain.entity.donation.Donation;
 import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
-import org.charitable.app.domain.port.outbound.donation.DonationRepository;
-import org.charitable.app.domain.port.outbound.organization.OrganizationRepository;
-import org.charitable.app.proto.ClaimDonationRequest;
+import org.charitable.app.domain.port.outbound.db.donation.DonationRepository;
+import org.charitable.app.domain.port.outbound.db.organization.OrganizationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

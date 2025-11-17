@@ -1,4 +1,4 @@
-package org.charitable.app.domain.port.outbound.user;
+package org.charitable.app.domain.port.outbound.db.user;
 
 import org.charitable.app.domain.entity.user.User;
 

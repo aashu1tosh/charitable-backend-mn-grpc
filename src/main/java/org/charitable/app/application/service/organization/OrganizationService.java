@@ -4,7 +4,7 @@ import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
 import org.charitable.app.domain.entity.organization.Organization;
-import org.charitable.app.domain.port.outbound.organization.OrganizationRepository;
+import org.charitable.app.domain.port.outbound.db.organization.OrganizationRepository;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
