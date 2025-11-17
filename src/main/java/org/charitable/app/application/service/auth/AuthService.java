@@ -256,8 +256,7 @@ class AuthService implements AuthUseCase {
             return;
         }
     }
-
-    public Auth verifyEmailAddress(String token) {
+    public Auth verifyEmail(String token) {
         var auth = authRepository.findByEmailVerificationToken(token);
 
         if(auth.isEmpty()) {

@@ -17,6 +17,8 @@ service AuthService {
 
   rpc MyInfo(EmptyRequest) returns (MyInfoResponse);
   rpc Logout (LogoutRequest) returns (CommonResponse);
+
+  rpc VerifyEmail(VerifyEmailRequest) returns (CommonResponse);
 }
 
 message RegisterAdminRequest {
@@ -110,4 +112,8 @@ message MyInfoResponse {
   bool success = 1;
   string message = 2;
   MyInfoData data = 3;
+}
+
+message VerifyEmailRequest {
+  string token = 1;
 }

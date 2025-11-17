@@ -1,5 +1,6 @@
 package org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth;
 
+import com.google.common.base.Verify;
 import io.grpc.stub.StreamObserver;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +10,9 @@ import org.charitable.app.application.dto.request.auth.LoginRequestDTO;
 import org.charitable.app.application.dto.request.auth.UpdateAuthStatusDTO;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
+import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.auth.AuthUseCase;
+import org.charitable.app.common.utils.StringUtils;
 import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValidationUtils;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
@@ -295,6 +298,25 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void verifyEmail(VerifyEmailRequest request, StreamObserver<CommonResponse> responseObserver) {
+        logger.info("Verify email request received.");
+
+        if(StringUtils.isEmpty(request.getToken())) {
+            throw AppException.badRequest("Token is empty. Please try again.");
+        }
+
+        authUseCase.verifyEmail(request.getToken());
+
+        CommonResponse response = CommonResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Verification Successful")
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+
     }
 
     @Override
