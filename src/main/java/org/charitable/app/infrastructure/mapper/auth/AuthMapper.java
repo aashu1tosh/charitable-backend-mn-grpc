@@ -70,6 +70,8 @@ public class AuthMapper {
                 .isEmailVerified(domain.getIsEmailVerified())
                 .status(domain.getStatus())
                 .phoneNumber(domain.getPhone())
+                .emailVerificationToken(domain.getEmailVerificationToken())
+                .emailVerificationPublishAt(domain.getEmailVerificationPublishAt())
                 .organization(domain.getOrganization() != null ? OrganizationMapper.mapToEntitySafe(domain.getOrganization()) : null)
                 .user(domain.getUser() != null ? UserMapper.mapToSafeEntity(domain.getUser()) : null)
                 .admin(domain.getAdmin() != null ? AdminMapper.mapToSafeEntity(domain.getAdmin()) : null)
