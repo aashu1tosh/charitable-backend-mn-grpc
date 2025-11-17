@@ -22,14 +22,14 @@ class OrganizationService implements OrganizationUseCase {
     public Organization register(OrganizationRegisterRequestDTO organization) {
         logger.info("Service register organization: {}", organization.getName());
 
-        var org = new Organization(
-        organization.getName(),
-        organization.getAddress(),
-        organization.getLatitude(),
-        organization.getLongitude(),
-        organization.getGovtId(),
-        organization.getContactNumber(),
-        null);
+        var org = Organization.builder()
+                .name(organization.getName())
+                .address(organization.getAddress())
+                .latitude(organization.getLatitude())
+                .longitude(organization.getLongitude())
+                .govtId(organization.getGovtId())
+                .contactNumber(organization.getContactNumber())
+                .build();
         
         var resp = organizationRepository.save(org);
         logger.info("Registered organization: {}", resp);

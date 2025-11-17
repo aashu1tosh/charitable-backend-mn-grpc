@@ -24,6 +24,7 @@ import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.db.auth.AuthRepository;
 import org.charitable.app.domain.port.outbound.db.auth.authStatusHistory.AuthStatusHistoryRepository;
 import org.charitable.app.domain.port.outbound.emailQueue.EmailPublisherPort;
+import org.charitable.app.domain.port.outbound.emailQueue.EmailTemplateLoadPort;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.charitable.app.infrastructure.adapter.outbound.rabbitmq.EmailMessage;
 
@@ -44,6 +45,7 @@ class AuthService implements AuthUseCase {
     private final AuthTokenManager tokenService;
     private final AdminUseCase adminService;
     private final EmailPublisherPort emailPublisher;
+    private final EmailTemplateLoadPort emailTemplate;
 
     AuthService(
             AuthRepository authRepository,
@@ -52,7 +54,9 @@ class AuthService implements AuthUseCase {
             UserUseCase userService,
             AdminUseCase adminService,
             AuthTokenManager tokenService,
-            AuthStatusHistoryRepository authStatusHistoryRepository, EmailPublisherPort emailPublisher) {
+            AuthStatusHistoryRepository authStatusHistoryRepository,
+            EmailPublisherPort emailPublisher,
+            EmailTemplateLoadPort emailTemplateLoadPort) {
         this.authRepository = authRepository;
         this.passwordHash = passwordHash;
         this.organizationService = organizationService;
@@ -61,6 +65,7 @@ class AuthService implements AuthUseCase {
         this.adminService = adminService;
         this.authStatusHistoryRepository = authStatusHistoryRepository;
         this.emailPublisher = emailPublisher;
+        this.emailTemplate = emailTemplateLoadPort;
     }
 
     public IdentityTokens login(LoginRequestDTO data) {
@@ -239,12 +244,15 @@ class AuthService implements AuthUseCase {
             EmailMessage message = EmailMessage.builder()
                     .to(authData.getEmail())
                     .subject("Verify your email")
-                    .templateName("verify-email.html")
-                    .variables(Map.of(
-                            "email", authData.getEmail(),
-                            "link", "http://localhost:3000/verify-email?token=" + token
+                    .template(emailTemplate.loadTemplate(
+                            "verify-email.html",
+                            Map.of(
+                                    "email", authData.getEmail(),
+                                    "link", "http://localhost:3000/verify-email/" + token
+                            )
                     ))
                     .build();
+
 
             emailPublisher.sendEmail(message);
             return;

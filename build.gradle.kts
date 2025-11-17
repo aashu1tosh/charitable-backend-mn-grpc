@@ -34,6 +34,8 @@ dependencies {
     // for server reflection
     implementation("io.grpc:grpc-services")
 
+    implementation("org.apache.commons:commons-text:1.10.0")
+
     //security (for bcrypt)
     implementation("org.springframework.security:spring-security-crypto:6.1.5")
     // for logging with spring implementation

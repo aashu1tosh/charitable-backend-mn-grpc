@@ -12,7 +12,7 @@ import java.util.Map;
 @Serdeable
 public class EmailMessage {
     private String to;
+    private String from;
     private String subject;
-    private String templateName;
-    private Map<String, Object> variables;
+    private String template;
 }
