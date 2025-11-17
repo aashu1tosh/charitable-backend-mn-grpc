@@ -64,7 +64,7 @@ public class AuthEntity extends BaseEntity {
     @OneToMany(mappedBy = "auth", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AuthStatusHistoryEntity> authStatusHistories = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "organization_id", nullable = true)
     private OrganizationEntity organization;
 

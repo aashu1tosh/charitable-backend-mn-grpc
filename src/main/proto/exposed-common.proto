@@ -52,11 +52,45 @@ message Organization {
 }
 
 message User {
-  string firstName = 1;
-  string middleName = 2;
-  string lastName = 3;
-  float  latitude = 4;
-  float longitude = 5;
+  string id =1;
+  string createdAt = 2;
+  string firstName = 3;
+  string middleName = 4;
+  string lastName = 5;
+  float  latitude = 6;
+  float longitude = 7;
+}
+
+message Auth {
+  string id =1;
+  string createdAt =2;
+  string email = 3;
+  string phone = 7;
+  string isEmailVerified = 4;
+  Role role = 5;
+  AuthStatus status = 6;
+}
+
+message AuthStatusHistory {
+  string id = 1;
+  string createdAt = 2;
+  AuthStatus status = 3;
+}
+
+message AuthDetail {
+  string id =1;
+  string createdAt =2;
+  string email = 3;
+  string phone = 4;
+  string isEmailVerified = 5;
+
+  Role role = 6;
+  AuthStatus status = 7;
+
+  repeated AuthStatusHistory history = 8;
+
+  string emailVerificationToken = 9;
+  string emailVerificationPublishAt = 10;
 }
 
 message Pagination {

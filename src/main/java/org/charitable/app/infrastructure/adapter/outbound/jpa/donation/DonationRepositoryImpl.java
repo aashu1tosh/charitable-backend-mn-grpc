@@ -7,10 +7,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.charitable.app.common.utils.PrintUtils;
 import org.charitable.app.domain.common.pagination.Page;
 import org.charitable.app.domain.common.pagination.Pagination;
 import org.charitable.app.domain.entity.donation.Donation;
 import org.charitable.app.domain.entity.organization.Organization;
+import org.charitable.app.domain.model.Role;
 import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
@@ -30,6 +33,7 @@ import java.util.UUID;
 
 @Singleton
 @Repository
+@Slf4j
 class DonationRepositoryImpl implements DonationRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(DonationRepositoryImpl.class);
@@ -75,6 +79,9 @@ class DonationRepositoryImpl implements DonationRepository {
     @ReadOnly
     @Override
     public Page<Donation> getDonations(DonationFilter filter, TokenPayload user) {
+
+        log.info("getDonations({}, {})", PrintUtils.prettyPrint(filter), PrintUtils.prettyPrint(user));
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<DonationEntity> cq = cb.createQuery(DonationEntity.class);
         Root<DonationEntity> donation = cq.from(DonationEntity.class);
@@ -102,10 +109,9 @@ class DonationRepositoryImpl implements DonationRepository {
             predicates.add(cb.equal(donation.get("status"), filter.getStatus()));
         }
 
-        if (user != null && user.getUserId() != null) {
+        if (user.getRole().equals(Role.USER)) {
             predicates.add(cb.equal(donorJoin.get("id"), user.getId()));
-            predicates.add(cb.equal(organizationJoin.get("id"), user.getUserId()));
-        } else {
+        } else if (user.getRole().equals(Role.ORGANIZATION_ADMIN) || user.getRole().equals(Role.ORGANIZATION_SUPER_ADMIN)) {
             predicates.add(cb.isNull(organizationJoin.get("id")));
         }
 

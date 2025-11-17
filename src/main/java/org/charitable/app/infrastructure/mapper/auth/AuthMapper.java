@@ -44,6 +44,7 @@ public class AuthMapper {
                 .updatedAt(authEntity.getUpdatedAt())
                 .email(authEntity.getEmail())
                 .phone(authEntity.getPhoneNumber())
+                .password(authEntity.getPassword())
                 .role(authEntity.getRole())
                 .isEmailVerified(authEntity.getIsEmailVerified())
                 .emailVerificationPublishAt(authEntity.getEmailVerificationPublishAt())

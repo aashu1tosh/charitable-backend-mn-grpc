@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.charitable.app.proto";
+option java_outer_classname = "UserProto";
+
+import "exposed-common.proto";
+
+service UserService {
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
+  rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
+
+}
+
+message GetUsersRequest {
+  optional int32 page = 1;
+  optional int32 limit = 2;
+  optional string search = 3;
+}
+
+message UserAuth {
+  string id =1;
+  string createdAt =2;
+  string email = 3;
+  string isEmailVerified = 4;
+  Role role = 5;
+  AuthStatus status = 6;
+}
+
+message UserData {
+  string firstName = 1;
+  string middleName = 2;
+  string lastName = 3;
+  float  latitude = 4;
+  float longitude = 5;
+  UserAuth auth = 6;
+}
+
+message GetUsersResponse {
+  string success = 1;
+  string message = 2;
+  PaginatedUsers data = 3;
+
+  message PaginatedUsers {
+    repeated UserData data = 1;
+    Pagination pagination = 2;
+  }
+}
+
+message GetUserByIdRequest {
+  string id =1 ;
+}
+
+message GetUserByIdResponse {
+  bool success = 1;
+  string message = 2;
+  AuthDetail data = 3;
+}
+

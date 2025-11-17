@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.charitable.app.proto";
+option java_outer_classname = "OrganizationProto";
+
+import "exposed-common.proto";
+
+service OrganizationService {
+  rpc GetOrganizations(GetOrganizationRequest) returns (GetOrganizationResponse);
+  rpc GetOrganizationById(GetOrganizationByIdRequest) returns (GetOrganizationByIdResponse);
+
+  rpc GetOrganizationAdmins(GetOrganizationAdminsRequest) returns (GetOrganizationAdminResponse);
+//  rpc GetOrganizationRelatedDonations(GetOrganizationDonationRequest) returns (GetOrganizationAdminResponse);
+}
+
+message GetOrganizationRequest {
+  optional int32 page = 1;
+  optional int32 limit = 2;
+  optional string search = 3;
+  optional string OrganizationId = 4;
+}
+
+message GetOrganizationResponse {
+  string success = 1;
+  string message = 2;
+  PaginatedOrganizations data = 3;
+
+  message PaginatedOrganizations {
+    repeated Organization data = 1;
+    Pagination pagination = 2;
+  }
+}
+
+message GetOrganizationByIdRequest {
+  string id =1 ;
+}
+
+
+message GetOrganizationByIdResponse {
+  bool success = 1;
+  string message = 2;
+  Organization data = 3;
+}
+
+message GetOrganizationAdminsRequest {
+  optional int32 page = 1;
+  optional int32 limit = 2;
+  optional string search = 3;
+}
+
+message Admins {
+  string firstName = 1;
+  string secondName = 2;
+  string lastName = 3;
+}
+
+message AdminsDetail {
+  string firstName = 1;
+  string secondName = 2;
+  string lastName = 3;
+  AuthDetail auth = 4;
+}
+
+message GetOrganizationAdminResponse {
+  string success = 1;
+  string message = 2;
+  PaginatedOrganizationAdmins data = 3;
+
+  message PaginatedOrganizationAdmins {
+    repeated Admins data = 1;
+    Pagination pagination = 2;
+  }
+}
+
+//message GetOrganizationDonationRequest {
+//  optional int32 page = 1;
+//  optional int32 limit = 2;
+//  optional string search = 3;
+//  optional string OrganizationId = 4;
+//}
+//
+//message GetOrganizationDonationResponse {
+//  string success = 1;
+//  string message = 2;
+//  PaginatedOrganizationDonations data = 3;
+//
+//  message PaginatedOrganizationDonations {
+//    repeated Dona data = 1;
+//    Pagination pagination = 2;
+//  }
+//}
+

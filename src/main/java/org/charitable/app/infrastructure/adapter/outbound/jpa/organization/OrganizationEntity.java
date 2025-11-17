@@ -8,6 +8,9 @@ import lombok.experimental.SuperBuilder;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.auth.AuthEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "organization")
 @Getter
@@ -40,6 +43,7 @@ public class OrganizationEntity extends BaseEntity {
     @NotNull
     private String contactNumber;
 
-    @OneToOne(mappedBy = "organization")
-    private AuthEntity auth;
+    @OneToMany(mappedBy = "organization")
+    private List<AuthEntity> auths = new ArrayList<>();
+
 }
