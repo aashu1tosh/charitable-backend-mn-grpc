@@ -41,6 +41,10 @@ public class EnvVariables {
         return Long.parseLong(exp);
     }
 
+    public String getFrontEndUri() {
+        return getEnvOrThrow("frontend.uri");
+    }
+
 
     private String getEnvOrThrow(String key) {
         return environment.getProperty(key, String.class).orElseThrow(() -> AppException.internal("Something went wrong. Please try again"));

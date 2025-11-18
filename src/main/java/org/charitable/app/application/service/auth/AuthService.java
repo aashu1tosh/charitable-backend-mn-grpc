@@ -27,6 +27,7 @@ import org.charitable.app.domain.port.outbound.emailQueue.EmailPublisherPort;
 import org.charitable.app.domain.port.outbound.emailQueue.EmailTemplateLoadPort;
 import org.charitable.app.domain.port.outbound.passwordHash.PasswordHash;
 import org.charitable.app.infrastructure.adapter.outbound.rabbitmq.EmailMessage;
+import org.charitable.app.infrastructure.config.environment.EnvVariables;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -46,6 +47,7 @@ class AuthService implements AuthUseCase {
     private final AdminUseCase adminService;
     private final EmailPublisherPort emailPublisher;
     private final EmailTemplateLoadPort emailTemplate;
+    private final EnvVariables env;
 
     AuthService(
             AuthRepository authRepository,
@@ -56,7 +58,8 @@ class AuthService implements AuthUseCase {
             AuthTokenManager tokenService,
             AuthStatusHistoryRepository authStatusHistoryRepository,
             EmailPublisherPort emailPublisher,
-            EmailTemplateLoadPort emailTemplateLoadPort) {
+            EmailTemplateLoadPort emailTemplateLoadPort,
+            EnvVariables env) {
         this.authRepository = authRepository;
         this.passwordHash = passwordHash;
         this.organizationService = organizationService;
@@ -66,6 +69,7 @@ class AuthService implements AuthUseCase {
         this.authStatusHistoryRepository = authStatusHistoryRepository;
         this.emailPublisher = emailPublisher;
         this.emailTemplate = emailTemplateLoadPort;
+        this.env = env;
     }
 
     public IdentityTokens login(LoginRequestDTO data) {
@@ -240,15 +244,23 @@ class AuthService implements AuthUseCase {
 
             var update = authRepository.update(authData);
 
+            var user = authRepository.findMyInfo(authData.getId());
 
+            String fullName = switch (user.getRole()) {
+                case ORGANIZATION_ADMIN, ORGANIZATION_SUPER_ADMIN, ADMIN ->
+                        user.getAdmin().getFirstName() + " " + user.getAdmin().getLastName();
+                case USER -> user.getUser().getFirstName() + " " + user.getUser().getLastName();
+                default -> "User";
+            };
             EmailMessage message = EmailMessage.builder()
                     .to(authData.getEmail())
                     .subject("Verify your email")
                     .template(emailTemplate.loadTemplate(
                             "verify-email.html",
                             Map.of(
+                                    "fullName", fullName,
                                     "email", authData.getEmail(),
-                                    "link", "http://localhost:3000/verify-email/" + token
+                                    "link", env.getFrontEndUri() + "verify-email/" + token
                             )
                     ))
                     .build();
