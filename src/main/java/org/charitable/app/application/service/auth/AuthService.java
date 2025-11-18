@@ -16,6 +16,7 @@ import org.charitable.app.application.port.inbound.auth.AuthUseCase;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
 import org.charitable.app.application.port.inbound.user.UserUseCase;
 import org.charitable.app.application.port.outbound.authToken.AuthTokenManager;
+import org.charitable.app.common.utils.PrintUtils;
 import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.IdentityTokens;
@@ -245,13 +246,14 @@ class AuthService implements AuthUseCase {
             var update = authRepository.update(authData);
 
             var user = authRepository.findMyInfo(authData.getId());
-
+            log.info("User Details: {}", PrintUtils.prettyPrint(user));
             String fullName = switch (user.getRole()) {
                 case ORGANIZATION_ADMIN, ORGANIZATION_SUPER_ADMIN, ADMIN ->
                         user.getAdmin().getFirstName() + " " + user.getAdmin().getLastName();
                 case USER -> user.getUser().getFirstName() + " " + user.getUser().getLastName();
                 default -> "User";
             };
+            log.info("Full name : {}", fullName);
             EmailMessage message = EmailMessage.builder()
                     .to(authData.getEmail())
                     .subject("Verify your email")
@@ -263,6 +265,7 @@ class AuthService implements AuthUseCase {
                                     "link", env.getFrontEndUri() + "verify-email/" + token
                             )
                     ))
+                    .from("noreply@givehope.com")
                     .build();
 
 
