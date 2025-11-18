@@ -73,6 +73,10 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     compileOnly("org.projectlombok:lombok:1.18.30")
 
+    // For minIO
+//    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("software.amazon.awssdk:s3")
+
     // HTTP client and logging
     compileOnly("io.micronaut:micronaut-http-client:4.9.4")
     runtimeOnly("ch.qos.logback:logback-classic:1.4.14")
