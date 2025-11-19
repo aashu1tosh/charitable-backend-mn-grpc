@@ -12,7 +12,7 @@ public interface MediaStoragePort {
      * @param contentType MIME type of the image (e.g., "image/png")
      * @return The path or URL of the uploaded image
      */
-    String uploadImage(String bucketName, String filename, InputStream content, String contentType);
+    String uploadImage(String bucketName, String filename, InputStream content, String contentType, Long contentLength);
 
     /**
      * Deletes an image from storage.

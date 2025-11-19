@@ -16,25 +16,11 @@ import java.io.InputStream;
 class MediaService implements MediaUseCase {
 
     private final MediaStoragePort storagePort;
-    private final S3Client s3Client;
 
-    private void ensureBucketExists(String bucketName) {
-        try {
-            HeadBucketRequest headBucketRequest = HeadBucketRequest.builder()
-                    .bucket(bucketName)
-                    .build();
-            s3Client.headBucket(headBucketRequest);
-        } catch (NoSuchBucketException e) {
-            CreateBucketRequest createBucketRequest = CreateBucketRequest.builder()
-                    .bucket(bucketName)
-                    .build();
-            s3Client.createBucket(createBucketRequest);
-        }
-    }
 
     @Override
-    public String uploadDonationImage(String authId, String bucketName, String imageName, InputStream content, String contentType) {
+    public String uploadDonationImage(String authId, String bucketName, String imageName, InputStream content, String contentType, Long contentLength) {
         String filename = authId + "/" + imageName;
-        return storagePort.uploadImage(bucketName, filename, content, contentType);
+        return storagePort.uploadImage(bucketName, filename, content, contentType, contentLength);
     }
 }

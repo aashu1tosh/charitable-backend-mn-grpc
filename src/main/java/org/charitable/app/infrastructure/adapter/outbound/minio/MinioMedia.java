@@ -112,21 +112,21 @@ class MinioMedia implements MediaStoragePort {
 //    }
 
     @Override
-    public String uploadImage(String bucketName, String filename, InputStream content, String contentType) {
+    public String uploadImage(String bucketName, String filename, InputStream content, String contentType, Long contentLength) {
         try {
             ensureBucketExists(bucketName);
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(filename)
                     .contentType(contentType)
+                    .contentLength(contentLength)
                     .build();
 
-            long contentLength = content.available();
             s3Client.putObject(request, RequestBody.fromInputStream(content, contentLength));
 
 //            return String.format(bucketName, filename);
             return bucketName +'/' + filename;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to upload image", e);
         }
     }

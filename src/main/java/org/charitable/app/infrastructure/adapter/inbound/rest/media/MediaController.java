@@ -39,6 +39,9 @@ public class MediaController {
         if(StringUtils.isEmpty(bucket) || !BucketConstants.ALL_BUCKETS.contains(bucket)) {
             throw AppException.badRequest("Bucket is not a valid bucket");
         }
+        String contentType = file.getContentType()
+                .map(MediaType::getName)
+                .orElse("image/jpeg");
 
         try (InputStream inputStream = file.getInputStream()) {
             var url =  service.uploadDonationImage(
@@ -46,7 +49,8 @@ public class MediaController {
                     bucket,
                     file.getFilename(),
                     inputStream,
-                    file.getContentType().toString()
+                    contentType,
+                    file.getSize()
             );
             log.info("Uploaded image from {} to {}", url, file.getFilename());
             return new AppResponse<String>(true, "Uploaded Successfully", url);
