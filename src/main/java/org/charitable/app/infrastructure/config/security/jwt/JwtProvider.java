@@ -64,6 +64,7 @@ class JwtProvider implements AuthTokenManager {
                 .claim("role", auth.getRole().toString())
                 .claim("organization_id", auth.getOrganization() != null ? auth.getOrganization().getId().toString() : null)
                 .claim("user_id", auth.getUser() != null ? auth.getUser().getId().toString() : null)
+                .claim("admin_id", auth.getAdmin() != null ? auth.getAdmin().getId() : null)
                 .build();
 
         return signToken(claims, secret);
@@ -80,7 +81,11 @@ class JwtProvider implements AuthTokenManager {
                 .issuer("charitable-backend")
                 .issueTime(now)
                 .expirationTime(exp)
+                .claim("id", auth.getId().toString())
                 .claim("role", auth.getRole().toString())
+                .claim("organization_id", auth.getOrganization() != null ? auth.getOrganization().getId().toString() : null)
+                .claim("user_id", auth.getUser() != null ? auth.getUser().getId().toString() : null)
+                .claim("admin_id", auth.getAdmin() != null ? auth.getAdmin().getId() : null)
                 .build();
 
         return signToken(claims, secret);
