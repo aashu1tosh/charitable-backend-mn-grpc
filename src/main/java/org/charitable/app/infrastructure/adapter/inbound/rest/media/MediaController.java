@@ -8,7 +8,11 @@ import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import lombok.AllArgsConstructor;
+import org.charitable.app.application.dto.response.AppResponse;
+import org.charitable.app.application.exception.AppException;
 import org.charitable.app.application.port.inbound.media.MediaUseCase;
+import org.charitable.app.common.utils.StringUtils;
+import org.charitable.app.domain.model.media.BucketConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,15 +25,21 @@ public class MediaController {
     private final MediaUseCase service;
 
     @Post(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA)
-    public String uploadImage(@Part CompletedFileUpload file) {
+    public AppResponse<String> uploadImage(@Part("file") CompletedFileUpload file, @Part("bucket") String bucket) {
+
+        if(StringUtils.isEmpty(bucket) || !BucketConstants.ALL_BUCKETS.contains(bucket)) {
+            throw AppException.badRequest("Bucket is not a valid bucket");
+        }
+
         try (InputStream inputStream = file.getInputStream()) {
-            // You can replace "user123" with actual user ID dynamically
-            return service.uploadDonationImage(
+            var url =  service.uploadDonationImage(
                     "user123",
+                    bucket,
                     file.getFilename(),
                     inputStream,
                     file.getContentType().toString()
             );
+            return new AppResponse<String>(true, "Uploaded Successfully", url);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read uploaded file", e);
         }

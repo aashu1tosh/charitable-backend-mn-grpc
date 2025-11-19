@@ -20,7 +20,7 @@ public class DonationMapper {
                 .longitude(entity.getLongitude() != null ? entity.getLongitude() : 0)
                 .type(entity.getType())
                 .status(entity.getStatus())
-                .url(entity.getUrl() != null ?  entity.getUrl() : "")
+                .urlPath(entity.getUrlPath() != null ?  entity.getUrlPath() : "")
                 .build();
 
     }
@@ -37,7 +37,7 @@ public class DonationMapper {
                 .status(domain.getStatus())
                 .latitude(domain.getLatitude())
                 .longitude(domain.getLongitude())
-                .url(domain.getUrl() != null ?  domain.getUrl() : null)
+                .urlPath(domain.getUrlPath() != null ?  domain.getUrlPath() : null)
                 .build();
         entity.setId(domain.getId());
         entity.setCreatedAt(domain.getCreatedAt());

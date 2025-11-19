@@ -43,7 +43,7 @@ public class DonationService implements DonationUseCase {
                 .donor(authService.findById(user.getId()))
                 .latitude(req.getLatitude())
                 .longitude(req.getLongitude())
-                .url(req.getUrl() != null ?  req.getUrl() : null)
+                .urlPath(req.getUrl() != null ?  req.getUrl() : null)
                 .build();
 
         return donationRepo.save(donation);

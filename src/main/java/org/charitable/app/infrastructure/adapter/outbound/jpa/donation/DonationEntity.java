@@ -50,8 +50,8 @@ public class DonationEntity extends BaseEntity {
     @Column()
     private Float longitude;
 
-    @Column()
-    private String url;
+    @Column(name = "url_path")
+    private String urlPath;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "donor_auth_id", nullable = true)

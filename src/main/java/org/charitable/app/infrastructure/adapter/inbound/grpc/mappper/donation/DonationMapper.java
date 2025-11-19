@@ -17,7 +17,7 @@ public class DonationMapper {
                 .setUpdatedAt(!ValueUtils.checkNullOrEmpty(domain.getUpdatedAt()) ? domain.getUpdatedAt().toString() : "")
                 .setTitle(!ValueUtils.checkNullOrEmpty(domain.getTitle()) ? domain.getTitle() : "")
                 .setDescription(!ValueUtils.checkNullOrEmpty(domain.getDescription()) ? domain.getDescription(): "")
-                .setUrl(!ValueUtils.checkNullOrEmpty(domain.getUrl()) ? domain.getUrl() : "")
+                .setUrl(!ValueUtils.checkNullOrEmpty(domain.getUrlPath()) ? domain.getUrlPath() : "")
                 .setType(DonationTypeMapper.toProto(domain.getType()))
                 .setStatus(DonationStatusMapper.toProto(domain.getStatus()))
                 .build();

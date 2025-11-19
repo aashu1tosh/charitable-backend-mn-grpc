@@ -15,7 +15,7 @@ import org.charitable.app.domain.model.donation.DonationType;
 public class Donation extends Base {
     private String title;
     private String description;
-    private String url;
+    private String urlPath;
     private Float latitude;
     private Float longitude;
     private Auth donor;

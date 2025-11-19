@@ -68,7 +68,7 @@ class DonationRepositoryImpl implements DonationRepository {
                 .latitude(donation.getLatitude())
                 .longitude(donation.getLongitude())
                 .donor(AuthMapper.mapToEntity(donation.getDonor()))
-                .url(donation.getUrl() != null ?  donation.getUrl() : null)
+                .urlPath(donation.getUrlPath() != null ?  donation.getUrlPath() : null)
                 .build();
         var resp = donationJpaRepo.save(entity);
         return DonationMapper.mapToDomain(resp);

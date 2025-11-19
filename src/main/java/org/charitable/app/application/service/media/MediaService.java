@@ -33,8 +33,8 @@ class MediaService implements MediaUseCase {
     }
 
     @Override
-    public String uploadDonationImage(String authId, String imageName, InputStream content, String contentType) {
+    public String uploadDonationImage(String authId, String bucketName, String imageName, InputStream content, String contentType) {
         String filename = authId + "/" + imageName;
-        return storagePort.uploadImage("donation-images", filename, content, contentType);
+        return storagePort.uploadImage(bucketName, filename, content, contentType);
     }
 }
