@@ -1,11 +1,15 @@
 package org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation;
 
+import io.micronaut.context.annotation.Value;
 import org.charitable.app.common.utils.UUIDUtils;
 import org.charitable.app.common.utils.ValueUtils;
 import org.charitable.app.domain.entity.donation.Donation;
 import org.charitable.app.proto.DonationItems;
 
 public class DonationMapper {
+
+    @Value("${aws.s3.endpoint}")
+    private String minioEndpoint;
 
     public static DonationItems  toProto(Donation domain) {
         if(domain == null) {
@@ -17,7 +21,7 @@ public class DonationMapper {
                 .setUpdatedAt(!ValueUtils.checkNullOrEmpty(domain.getUpdatedAt()) ? domain.getUpdatedAt().toString() : "")
                 .setTitle(!ValueUtils.checkNullOrEmpty(domain.getTitle()) ? domain.getTitle() : "")
                 .setDescription(!ValueUtils.checkNullOrEmpty(domain.getDescription()) ? domain.getDescription(): "")
-                .setUrl(!ValueUtils.checkNullOrEmpty(domain.getUrlPath()) ? domain.getUrlPath() : "")
+                .setUrl(!ValueUtils.checkNullOrEmpty(domain.getUrlPath()) ? "http://localhost:9000" + '/' + domain.getUrlPath() : "")
                 .setType(DonationTypeMapper.toProto(domain.getType()))
                 .setStatus(DonationStatusMapper.toProto(domain.getStatus()))
                 .build();

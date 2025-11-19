@@ -1,6 +1,7 @@
 package org.charitable.app.infrastructure.adapter.outbound.minio;
 
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.charitable.app.domain.port.outbound.media.MediaStoragePort;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.time.Duration;
 
 @Singleton
+@Slf4j
 class MinioMedia implements MediaStoragePort {
 
     private final S3Client s3Client;
@@ -24,18 +26,17 @@ class MinioMedia implements MediaStoragePort {
     }
 
     private void setPublicReadPolicy(String bucketName) {
-        // This is the JSON policy required to grant s3:GetObject (read) access to anyone (*)
         String policy = String.format("""
             {
-                "Version": "2012-10-17",
-                "Statement": [
-                    {
-                        "Effect": "Allow",
-                        "Principal": "*",
-                        "Action": "s3:GetObject",
-                        "Resource": "arn:aws:s3:::%s/*"
-                    }
-                ]
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": { "AWS": "*" },
+                  "Action": "s3:GetObject",
+                  "Resource": "arn:aws:s3:::%s/*"
+                }
+              ]
             }
             """, bucketName);
 
@@ -44,16 +45,25 @@ class MinioMedia implements MediaStoragePort {
                 .policy(policy)
                 .build();
 
-        s3Client.putBucketPolicy(putBucketPolicyRequest);
+        try {
+            s3Client.putBucketPolicy(putBucketPolicyRequest);
+            System.out.println("SUCCESS: Public read policy applied to bucket: " + bucketName);
+        } catch (S3Exception e) {
+            // ⭐ Log the error to see why MinIO denied the policy change!
+            System.err.println("CRITICAL: Failed to set public policy on bucket " + bucketName + ": " + e.getMessage());
+            throw new RuntimeException("Failed to apply public policy", e);
+        }
     }
 
     private void ensureBucketExists(String bucketName) {
         try {
+            log.info("Attempting to check if bucket exists on bucket: " + bucketName);
             HeadBucketRequest headBucketRequest = HeadBucketRequest.builder()
                     .bucket(bucketName)
                     .build();
             s3Client.headBucket(headBucketRequest);
         } catch (NoSuchBucketException e) {
+            log.info("Bucket Exception {}", bucketName);
             // 1. Create the bucket
             CreateBucketRequest createBucketRequest = CreateBucketRequest.builder()
                     .bucket(bucketName)
@@ -63,6 +73,7 @@ class MinioMedia implements MediaStoragePort {
             // 2. Set the policy to make it publicly readable
             setPublicReadPolicy(bucketName);
         }
+        setPublicReadPolicy(bucketName);
     }
 
     private String getPresignedUrl(String bucketName, String filename) {
@@ -113,8 +124,8 @@ class MinioMedia implements MediaStoragePort {
             long contentLength = content.available();
             s3Client.putObject(request, RequestBody.fromInputStream(content, contentLength));
 
-            return String.format(bucketName, filename);
-
+//            return String.format(bucketName, filename);
+            return bucketName +'/' + filename;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload image", e);
         }

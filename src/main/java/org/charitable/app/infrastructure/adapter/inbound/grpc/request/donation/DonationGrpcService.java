@@ -18,6 +18,7 @@ import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.D
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.DonationStatusMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.donation.DonationTypeMapper;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.mappper.pagination.PaginationMapper;
+import org.charitable.app.infrastructure.config.environment.EnvVariables;
 import org.charitable.app.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,12 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
     private final DonationUseCase donationService;
     private final ValidationUtils validator;
+    private final EnvVariables env;
 
-    public DonationGrpcService(DonationUseCase donationService, ValidationUtils validator) {
+    public DonationGrpcService(DonationUseCase donationService, ValidationUtils validator, EnvVariables env) {
         this.donationService = donationService;
         this.validator = validator;
+        this.env = env;
     }
 
     @Override
