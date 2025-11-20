@@ -114,8 +114,6 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
-
-        throw AppException.internal("Method not allowed");
     }
 
     @Override

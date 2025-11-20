@@ -35,7 +35,7 @@ public class MediaController {
 
     @Post(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA)
     public AppResponse<String> uploadImage(@Part("file") CompletedFileUpload file, @Part("bucket") String bucket) {
-
+        log.info("MediaController hit uploadImage");
         if(StringUtils.isEmpty(bucket) || !BucketConstants.ALL_BUCKETS.contains(bucket)) {
             throw AppException.badRequest("Bucket is not a valid bucket");
         }
