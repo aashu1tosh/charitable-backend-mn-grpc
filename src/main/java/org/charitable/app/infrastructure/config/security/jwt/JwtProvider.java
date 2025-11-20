@@ -189,6 +189,7 @@ class JwtProvider implements AuthTokenManager {
         } catch (ParseException e) {
             throw AppException.unauthorized("Malformed token");
         } catch (Exception e) {
+            logger.error("Error while refreshing token:", e);
             throw AppException.internal("Error validating token: " + e.getMessage());
         }
     }

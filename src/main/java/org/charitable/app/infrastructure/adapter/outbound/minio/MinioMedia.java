@@ -3,6 +3,7 @@ package org.charitable.app.infrastructure.adapter.outbound.minio;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.charitable.app.domain.port.outbound.media.MediaStoragePort;
+import org.charitable.app.infrastructure.config.environment.EnvVariables;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -19,10 +20,12 @@ class MinioMedia implements MediaStoragePort {
 
     private final S3Client s3Client;
     private final S3Presigner presigner;
+    private final EnvVariables env;
 
-    public MinioMedia(S3Client s3Client, S3Presigner presigner) {
+    public MinioMedia(S3Client s3Client, S3Presigner presigner, EnvVariables env) {
         this.s3Client = s3Client;
         this.presigner = presigner;
+        this.env = env;
     }
 
     private void setPublicReadPolicy(String bucketName) {
@@ -125,7 +128,7 @@ class MinioMedia implements MediaStoragePort {
             s3Client.putObject(request, RequestBody.fromInputStream(content, contentLength));
 
 //            return String.format(bucketName, filename);
-            return bucketName +'/' + filename;
+            return env.getMinioUri() + '/' + bucketName +'/' + filename;
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload image", e);
         }
