@@ -17,7 +17,7 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 @Getter
 @Setter
 public class AdminEntity extends BaseEntity {
-    @Column(name="first_name", nullable = false, unique = true)
+    @Column(name="first_name", nullable = false)
     @NotNull
     private String firstName;
 

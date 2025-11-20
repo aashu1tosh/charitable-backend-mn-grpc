@@ -109,7 +109,9 @@ class DonationRepositoryImpl implements DonationRepository {
             predicates.add(cb.equal(donation.get("status"), filter.getStatus()));
         }
 
-        if (user.getRole().equals(Role.USER)) {
+        if (user == null) {
+            // no predicate added
+        } else if (user.getRole().equals(Role.USER)) {
             predicates.add(cb.equal(donorJoin.get("id"), user.getId()));
         } else if (user.getRole().equals(Role.ORGANIZATION_ADMIN) || user.getRole().equals(Role.ORGANIZATION_SUPER_ADMIN)) {
             predicates.add(cb.isNull(organizationJoin.get("id")));

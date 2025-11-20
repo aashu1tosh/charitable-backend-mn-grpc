@@ -15,6 +15,7 @@ import org.charitable.app.domain.model.donation.DonationFilter;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.token.TokenPayload;
 import org.charitable.app.domain.port.outbound.db.donation.DonationRepository;
+import org.charitable.app.domain.port.outbound.db.donation.donationStatusHistoryRespository.DonationStatusHistoryRepository;
 import org.charitable.app.domain.port.outbound.db.organization.OrganizationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,21 +25,24 @@ public class DonationService implements DonationUseCase {
     private static final Logger logger = LoggerFactory.getLogger(DonationService.class);
 
     private final DonationRepository donationRepo;
+    private final DonationStatusHistoryRepository  donationStatusHistoryRepo;
     private final AuthUseCase authService;
     private final OrganizationRepository organizationRepo;
 
-    public DonationService(DonationRepository donationRepository, AuthUseCase authService, OrganizationRepository orgRepo) {
+    public DonationService(DonationRepository donationRepository, AuthUseCase authService, OrganizationRepository orgRepo, DonationStatusHistoryRepository donationStatusHistoryRepo) {
         this.donationRepo = donationRepository;
         this.authService = authService;
         this.organizationRepo = orgRepo;
+        this.donationStatusHistoryRepo = donationStatusHistoryRepo;
     }
 
     @Override
     public Donation donate(DonateRequestDTO req, TokenPayload user) {
+        var status = DonationStatus.AVAILABLE;
         var donation = Donation.builder()
                 .title(req.getTitle())
                 .description(req.getDescription())
-                .status(DonationStatus.AVAILABLE)
+                .status(status)
                 .type(req.getDonationType())
                 .donor(authService.findById(user.getId()))
                 .latitude(req.getLatitude())
@@ -46,7 +50,9 @@ public class DonationService implements DonationUseCase {
                 .urlPath(req.getUrl() != null ?  req.getUrl() : null)
                 .build();
 
-        return donationRepo.save(donation);
+        var resp = donationRepo.save(donation);
+        donationStatusHistoryRepo.save(resp, status);
+        return resp;
     }
 
     @Override
@@ -86,7 +92,9 @@ public class DonationService implements DonationUseCase {
             throw AppException.badRequest("Donation not available");
         }
 
-        return donationRepo.claimDonation(request.getId(), org.get());
+        var resp = donationRepo.claimDonation(request.getId(), org.get());
+        donationStatusHistoryRepo.save(resp, DonationStatus.CLAIMED);
+        return resp;
     }
 
     @Override
@@ -112,6 +120,8 @@ public class DonationService implements DonationUseCase {
             throw AppException.badRequest("This donation has been claimed by different organizations.");
         }
 
-        return donationRepo.gotDonation(donation.getId());
+        var resp = donationRepo.gotDonation(donation.getId());
+        donationStatusHistoryRepo.save(resp, DonationStatus.DONATED);
+        return resp;
     }
 }

@@ -25,8 +25,11 @@ public class AuthStatusHistoryRepositoryImpl implements AuthStatusHistoryReposit
                 .auth(AuthMapper.mapToEntity(auth))
                 .status(status)
                 .build();
+
+        var resp = authStatusHistoryJpaRepository.save(entity);
+
         log.info("Saving AuthStatusHistory for {}", PrintUtils.prettyPrint(entity));
-        return AuthStatusHistoryMapper.mapToDomain(entity);
+        return AuthStatusHistoryMapper.mapToDomain(resp);
     }
 
 
