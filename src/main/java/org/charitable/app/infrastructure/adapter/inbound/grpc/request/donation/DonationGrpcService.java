@@ -152,6 +152,8 @@ public class DonationGrpcService extends DonationServiceGrpc.DonationServiceImpl
 
         validator.validate(filter);
 
+        logger.info("Get the donation of {}", filter.toString());
+
         var resp = donationService.getDonation(filter, tokenPayload);
         var items = resp.getItems();
 
