@@ -20,11 +20,11 @@ import org.charitable.app.domain.model.media.BucketConstants;
 import java.io.IOException;
 import java.io.InputStream;
 
-@CrossOrigin(
-        allowedOrigins = {"http://localhost:3000"},
-        allowedMethods = {HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS},
-        allowCredentials = true
-)
+//@CrossOrigin(
+//        allowedOrigins = {"http://localhost:3000"},
+//        allowedMethods = {HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS},
+//        allowCredentials = true
+//)
 @Controller("/media")
 @AllArgsConstructor
 @Secured(SecurityRule.IS_ANONYMOUS)
