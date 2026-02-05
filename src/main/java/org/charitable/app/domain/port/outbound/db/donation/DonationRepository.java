@@ -1,4 +1,4 @@
-package org.charitable.app.domain.port.outbound.donation;
+package org.charitable.app.domain.port.outbound.db.donation;
 
 import org.charitable.app.domain.common.pagination.Page;
 import org.charitable.app.domain.entity.donation.Donation;

@@ -1,11 +1,10 @@
 package org.charitable.app.application.service.user;
 
 import jakarta.inject.Singleton;
-import jakarta.transaction.Transactional;
 import org.charitable.app.application.dto.request.user.UserRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.user.UserUseCase;
 import org.charitable.app.domain.entity.user.User;
-import org.charitable.app.domain.port.outbound.user.UserRepository;
+import org.charitable.app.domain.port.outbound.db.user.UserRepository;
 
 @Singleton
 class UserService implements UserUseCase {

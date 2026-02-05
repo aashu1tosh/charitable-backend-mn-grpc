@@ -3,7 +3,9 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.donation.donation
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.donation.DonationEntity;
@@ -12,7 +14,9 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.donation.DonationE
 @Table(name = "donation_status_history")
 @Getter
 @Setter
-public class DonationStatusHistory extends BaseEntity {
+@SuperBuilder
+@NoArgsConstructor
+public class DonationStatusHistoryEntity extends BaseEntity {
 
     @Column(name = "status", nullable = false)
     @NotNull

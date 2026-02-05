@@ -31,8 +31,7 @@ public class OrganizationMapper {
                 entity.getLatitude(),
                 entity.getLongitude(),
                 entity.getGovtId(),
-                entity.getContactNumber(),
-                null
+                entity.getContactNumber()
         );
         org.setId(entity.getId());
         org.setCreatedAt(entity.getCreatedAt());
@@ -66,7 +65,6 @@ public class OrganizationMapper {
                 .longitude(!ValueUtils.checkNullOrEmpty(domain.getLongitude()) ? domain.getLongitude() : null)
                 .govtId(!ValueUtils.checkNullOrEmpty(domain.getGovtId()) ? domain.getGovtId() : null)
                 .contactNumber(!ValueUtils.checkNullOrEmpty(domain.getContactNumber()) ? domain.getContactNumber() : null)
-                .auth(domain.getAuth() != null ? AuthMapper.mapToEntity(domain.getAuth()) : null)
                 .build();
         return entity;
     }

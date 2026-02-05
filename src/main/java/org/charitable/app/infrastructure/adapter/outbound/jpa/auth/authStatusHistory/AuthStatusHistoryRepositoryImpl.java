@@ -7,7 +7,7 @@ import org.charitable.app.common.utils.PrintUtils;
 import org.charitable.app.domain.entity.auth.Auth;
 import org.charitable.app.domain.entity.auth.authStatusHistory.AuthStatusHistory;
 import org.charitable.app.domain.model.auth.AuthStatus;
-import org.charitable.app.domain.port.outbound.auth.authStatusHistory.AuthStatusHistoryRepository;
+import org.charitable.app.domain.port.outbound.db.auth.authStatusHistory.AuthStatusHistoryRepository;
 import org.charitable.app.infrastructure.mapper.auth.AuthMapper;
 import org.charitable.app.infrastructure.mapper.auth.authStatusHistory.AuthStatusHistoryMapper;
 
@@ -25,8 +25,11 @@ public class AuthStatusHistoryRepositoryImpl implements AuthStatusHistoryReposit
                 .auth(AuthMapper.mapToEntity(auth))
                 .status(status)
                 .build();
+
+        var resp = authStatusHistoryJpaRepository.save(entity);
+
         log.info("Saving AuthStatusHistory for {}", PrintUtils.prettyPrint(entity));
-        return AuthStatusHistoryMapper.mapToDomain(entity);
+        return AuthStatusHistoryMapper.mapToDomain(resp);
     }
 
 

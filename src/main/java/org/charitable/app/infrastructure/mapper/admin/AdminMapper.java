@@ -5,13 +5,17 @@ import org.charitable.app.domain.entity.user.User;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.admin.AdminEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
 import org.charitable.app.infrastructure.mapper.auth.AuthMapper;
+import org.hibernate.Hibernate;
 
 public class AdminMapper {
 
-    public static Admin mapToDomain(AdminEntity adminEntity) {
-        if (adminEntity == null) return null;
+    public static Admin mapToDomain(AdminEntity entity) {
+        if (entity == null) return null;
 
-        return getAdmin(adminEntity);
+        if (!Hibernate.isInitialized(entity)) {
+            return null;
+        }
+        return getAdmin(entity);
     }
 
 

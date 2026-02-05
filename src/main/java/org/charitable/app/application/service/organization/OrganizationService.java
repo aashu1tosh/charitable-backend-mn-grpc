@@ -4,7 +4,7 @@ import jakarta.inject.Singleton;
 import org.charitable.app.application.dto.request.organization.OrganizationRegisterRequestDTO;
 import org.charitable.app.application.port.inbound.organization.OrganizationUseCase;
 import org.charitable.app.domain.entity.organization.Organization;
-import org.charitable.app.domain.port.outbound.organization.OrganizationRepository;
+import org.charitable.app.domain.port.outbound.db.organization.OrganizationRepository;
 import org.charitable.app.infrastructure.adapter.inbound.grpc.request.auth.AuthGrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +22,14 @@ class OrganizationService implements OrganizationUseCase {
     public Organization register(OrganizationRegisterRequestDTO organization) {
         logger.info("Service register organization: {}", organization.getName());
 
-        var org = new Organization(
-        organization.getName(),
-        organization.getAddress(),
-        organization.getLatitude(),
-        organization.getLongitude(),
-        organization.getGovtId(),
-        organization.getContactNumber(),
-        null);
+        var org = Organization.builder()
+                .name(organization.getName())
+                .address(organization.getAddress())
+                .latitude(organization.getLatitude())
+                .longitude(organization.getLongitude())
+                .govtId(organization.getGovtId())
+                .contactNumber(organization.getContactNumber())
+                .build();
         
         var resp = organizationRepository.save(org);
         logger.info("Registered organization: {}", resp);

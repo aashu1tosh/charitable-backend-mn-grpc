@@ -14,6 +14,7 @@ import org.charitable.app.infrastructure.adapter.outbound.jpa.base.BaseEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.organization.OrganizationEntity;
 import org.charitable.app.infrastructure.adapter.outbound.jpa.user.UserEntity;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,12 @@ public class AuthEntity extends BaseEntity {
     @NotNull
     private Boolean isEmailVerified;
 
+    @Column(name = "email_verification_token", nullable = true, unique = true)
+    private String emailVerificationToken;
+
+    @Column(name = "email_verification_publish_at", nullable = true)
+    private Instant emailVerificationPublishAt;
+
     @Column(name = "status", nullable = false)
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -57,7 +64,7 @@ public class AuthEntity extends BaseEntity {
     @OneToMany(mappedBy = "auth", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AuthStatusHistoryEntity> authStatusHistories = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "organization_id", nullable = true)
     private OrganizationEntity organization;
 

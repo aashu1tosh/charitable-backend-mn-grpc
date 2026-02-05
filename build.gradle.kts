@@ -34,10 +34,14 @@ dependencies {
     // for server reflection
     implementation("io.grpc:grpc-services")
 
+    implementation("org.apache.commons:commons-text:1.10.0")
+
     //security (for bcrypt)
     implementation("org.springframework.security:spring-security-crypto:6.1.5")
     // for logging with spring implementation
     implementation("org.springframework:spring-jcl:5.3.25")
+
+    implementation("io.micronaut.rabbitmq:micronaut-rabbitmq")
 
     // for cli (like seeding db)
     implementation("io.micronaut.picocli:micronaut-picocli")
@@ -68,6 +72,10 @@ dependencies {
     // Lombok
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     compileOnly("org.projectlombok:lombok:1.18.30")
+
+    // For minIO
+//    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("software.amazon.awssdk:s3")
 
     // HTTP client and logging
     compileOnly("io.micronaut:micronaut-http-client:4.9.4")

@@ -1,4 +1,4 @@
-package org.charitable.app.domain.port.outbound.organization;
+package org.charitable.app.domain.port.outbound.db.organization;
 
 import org.charitable.app.domain.entity.organization.Organization;
 

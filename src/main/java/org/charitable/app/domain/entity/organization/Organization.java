@@ -18,5 +18,4 @@ public class Organization extends Base {
     private Float longitude;
     private String govtId;
     private String contactNumber;
-    private Auth auth;
 }

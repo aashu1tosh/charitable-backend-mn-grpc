@@ -22,4 +22,6 @@ public interface AuthUseCase {
     Auth myInfo(UUID authId);
     Auth findById(UUID id);
     IdentityTokens refreshToken(String refreshToken);
+
+    Auth verifyEmail(String token);
 }

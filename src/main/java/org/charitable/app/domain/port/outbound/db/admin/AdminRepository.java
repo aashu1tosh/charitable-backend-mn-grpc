@@ -1,4 +1,4 @@
-package org.charitable.app.domain.port.outbound.admin;
+package org.charitable.app.domain.port.outbound.db.admin;
 
 
 import org.charitable.app.domain.entity.admin.Admin;

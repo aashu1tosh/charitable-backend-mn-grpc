@@ -2,7 +2,7 @@ package org.charitable.app.infrastructure.adapter.outbound.jpa.user;
 
 import jakarta.inject.Singleton;
 import org.charitable.app.domain.entity.user.User;
-import org.charitable.app.domain.port.outbound.user.UserRepository;
+import org.charitable.app.domain.port.outbound.db.user.UserRepository;
 import org.charitable.app.infrastructure.mapper.user.UserMapper;
 
 import java.util.Optional;

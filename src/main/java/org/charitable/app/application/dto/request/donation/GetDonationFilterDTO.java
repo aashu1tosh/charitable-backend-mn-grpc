@@ -4,6 +4,7 @@ import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.charitable.app.domain.model.donation.DonationStatus;
 import org.charitable.app.domain.model.donation.DonationType;
 
@@ -11,6 +12,7 @@ import org.charitable.app.domain.model.donation.DonationType;
 @Introspected
 @Getter
 @Setter
+@ToString
 public class GetDonationFilterDTO {
     @Builder.Default
     private Integer page = 1;

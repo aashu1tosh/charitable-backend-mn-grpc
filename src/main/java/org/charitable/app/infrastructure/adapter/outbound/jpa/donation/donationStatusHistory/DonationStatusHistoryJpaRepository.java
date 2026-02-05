@@ -6,5 +6,5 @@ import io.micronaut.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 @Repository
-public interface DonationStatusHistoryJpaRepository extends JpaRepository<DonationStatusHistory, UUID> {
+public interface DonationStatusHistoryJpaRepository extends JpaRepository<DonationStatusHistoryEntity, UUID> {
 }
