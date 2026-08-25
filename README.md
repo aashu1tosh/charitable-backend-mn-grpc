@@ -81,7 +81,7 @@ grpcwebproxy \
 If not installed install using
 
 ```
-    go install github.com/improbable-eng/grpc-web/go/grpcwebproxy
+    go install github.com/improbable-eng/grpc-web/go/grpcwebproxy@latest
 ```
 
 
